@@ -1,0 +1,2756 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --true-red: #e60012;
+      --true-red-dark: #b8000e;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --bg: #f7f7f8;
+      --panel: #ffffff;
+      --success: #16a34a;
+      --warn: #f59e0b;
+      --danger: #dc2626;
+      --blue: #2563eb;
+      --soft: #fff5f5;
+      --shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 18px 48px rgba(15, 23, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Mali', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      background:
+        radial-gradient(circle at 88% 2%, rgba(230, 0, 18, 0.07), transparent 26rem),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: linear-gradient(135deg, rgba(230, 0, 18, 0.95), rgba(17, 24, 39, 0.94)), #111827;
+    }
+
+    .login-panel {
+      width: min(420px, 100%);
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.35);
+    }
+
+    .login-brand, .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .login-brand { margin-bottom: 20px; }
+    .brand { margin-bottom: 24px; }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: var(--true-red);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .brand strong, .login-brand strong {
+      display: block;
+      font-size: 22px;
+    }
+
+    .brand span { color: #cbd5e1; font-size: 12px; }
+    .login-brand span { color: var(--muted); font-size: 12px; }
+
+    .runtime-warning {
+      display: none;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, #151c2b 0%, #0d111b 100%);
+      color: white;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button {
+      border: 0;
+      color: #e5e7eb;
+      background: transparent;
+      text-align: left;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .nav button.active, .nav button:hover {
+      background: var(--true-red);
+      color: white;
+    }
+
+    .user-box {
+      border-top: 1px solid #374151;
+      margin-top: 24px;
+      padding-top: 16px;
+      color: #cbd5e1;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    main {
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .top-actions, .actions, .export-actions, .period-tabs, .period-selectors {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .role-pill {
+      background: #fee2e2;
+      color: var(--true-red-dark);
+      border: 1px solid #fecaca;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .dashboard, .nas-summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .nas-summary { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
+    .dashboard-toolbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .period-selectors select, .period-selectors input {
+      width: auto;
+      min-width: 120px;
+      min-height: 42px;
+      padding: 9px 10px;
+    }
+
+    .period-tabs button {
+      border: 1px solid var(--line);
+      background: white;
+      color: #374151;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 42px;
+    }
+
+    .period-tabs button.active {
+      border-color: var(--true-red);
+      background: var(--true-red);
+      color: white;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 100px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 30px;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .required::after {
+      content: ' *';
+      color: var(--true-red);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      min-height: 42px;
+      padding: 10px 11px;
+      background: white;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--true-red);
+      box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.12);
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .span-2 { grid-column: span 2; }
+    .actions { margin-top: 16px; }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+    }
+
+    .btn-primary { background: var(--true-red); color: white; }
+    .btn-primary:hover { background: var(--true-red-dark); }
+    .btn-ghost { background: #f3f4f6; color: #374151; }
+    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .btn-small { padding: 8px 10px; min-height: 36px; font-size: 13px; }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .sheet-filter-shell {
+      border: 1px solid #dfe3e8;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff, #fbfcfd);
+      box-shadow: var(--shadow-sm);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .sheet-filter-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .sheet-filter-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .sheet-filter-title::before {
+      content: '≡';
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: white;
+      background: var(--true-red);
+      transform: rotate(90deg);
+    }
+
+    .result-count {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #991b1b;
+      background: #fee2e2;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .sheet-filter-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.5fr) repeat(2, minmax(145px, .72fr)) repeat(2, minmax(130px, .6fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .sheet-filter-grid.nas-filter-grid {
+      grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(125px, .65fr));
+    }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .filter-label input,
+    .filter-label select { margin-top: 6px; }
+
+    .facet-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    details.facet {
+      position: relative;
+    }
+
+    details.facet > summary {
+      list-style: none;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      padding: 8px 11px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+      color: #374151;
+      font-size: 12px;
+      font-weight: 800;
+      user-select: none;
+    }
+
+    details.facet > summary::-webkit-details-marker { display: none; }
+    details.facet > summary::after { content: '▾'; color: #9ca3af; }
+    details.facet[open] > summary { border-color: var(--true-red); box-shadow: 0 0 0 3px rgba(230, 0, 18, .1); }
+
+    .facet-menu {
+      position: absolute;
+      z-index: 12;
+      top: calc(100% + 7px);
+      left: 0;
+      width: min(260px, calc(100vw - 40px));
+      max-height: 290px;
+      overflow: auto;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 20px 55px rgba(15, 23, 42, .18);
+    }
+
+    .facet-menu label {
+      display: flex;
+      grid-template-columns: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 7px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .facet-menu label:hover { background: #f8fafc; }
+    .facet-menu input { width: auto; min-height: 0; padding: 0; }
+
+    .facet-badge {
+      min-width: 20px;
+      height: 20px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0 6px;
+      border-radius: 999px;
+      color: white;
+      background: var(--true-red);
+      font-size: 10px;
+    }
+
+    .month-strip {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 4px 1px 10px;
+      scrollbar-width: thin;
+    }
+
+    .month-chip {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 999px;
+      padding: 7px 10px;
+      color: #4b5563;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .month-chip.active {
+      color: white;
+      border-color: var(--true-red);
+      background: var(--true-red);
+    }
+
+    .month-chip small { opacity: .78; margin-left: 4px; }
+
+    tr.month-group-row td {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      padding: 10px 12px;
+      color: #7f1d1d;
+      background: linear-gradient(90deg, #fff1f2, #fff7ed);
+      border-top: 2px solid #fecaca;
+      font-weight: 800;
+    }
+
+    .month-group-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .empty-state {
+      padding: 34px 16px !important;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .permission-note {
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: #9a3412;
+      background: #fff7ed;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .btn[disabled], input[disabled], select[disabled], textarea[disabled] {
+      cursor: not-allowed;
+      opacity: .62;
+    }
+
+    .nas-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    .nas-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: -6px;
+      margin-bottom: 14px;
+    }
+
+    .bill-cell {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .bill-cell input[type="number"] { font-weight: 700; }
+    .bill-cell input,
+    .bill-cell select {
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .bill-status { font-weight: 700; }
+    .bill-status.unpaid { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+    .bill-status.paid { color: var(--success); border-color: #bbf7d0; background: #f0fdf4; }
+
+    .nas-row-actions {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .row-total {
+      border: 1px solid #fecaca;
+      background: linear-gradient(180deg, #fff7ed, #fef2f2);
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .row-total span {
+      display: block;
+      color: var(--true-red-dark);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 4px;
+    }
+
+    .row-total strong {
+      display: block;
+      color: #111827;
+      font-size: 18px;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    .nas-row-actions .btn {
+      width: 100%;
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .phone-link {
+      color: var(--true-red);
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .phone-link:hover { text-decoration: underline; }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      background: white;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #374151;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    .text-strong {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .text-red {
+      color: var(--true-red);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: #f9fafb;
+    }
+
+    .badge.Completed { color: var(--success); background: #dcfce7; border-color: #bbf7d0; }
+    .badge.Scheduled { color: var(--blue); background: #dbeafe; border-color: #bfdbfe; }
+    .badge.FIX { color: var(--warn); background: #fef3c7; border-color: #fde68a; }
+    .badge.Cancelled { color: var(--danger); background: #fee2e2; border-color: #fecaca; }
+    .badge.archive-ready { color: var(--success); background: #dcfce7; border-color: #bbf7d0; }
+    .badge.archive-wait { color: var(--warn); background: #fef3c7; border-color: #fde68a; }
+
+    .nas-table {
+      min-width: 1380px;
+      table-layout: fixed;
+    }
+
+    .nas-table th,
+    .nas-table td {
+      padding: 12px 10px;
+    }
+
+    .nas-table .code-col { width: 110px; }
+    .nas-table .name-col { width: 170px; }
+    .nas-table .date-col { width: 88px; }
+    .nas-table .phone-col { width: 116px; }
+    .nas-table .user-col { width: 100px; }
+    .nas-table .bill-col { width: 150px; }
+    .nas-table .archive-col { width: 82px; }
+    .nas-table .action-col { width: 126px; }
+
+    .nas-table .badge.archive-ready,
+    .nas-table .badge.archive-wait {
+      width: 64px;
+      min-height: 54px;
+      border-radius: 999px;
+      text-align: center;
+      line-height: 1.25;
+      white-space: normal;
+    }
+
+    .duplicate-warning {
+      display: none;
+      border: 2px solid #b91c1c;
+      background: #7f1d1d;
+      color: white;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .duplicate-warning ul {
+      margin: 6px 0 0;
+      padding-left: 20px;
+    }
+
+    input.duplicate-input {
+      border-color: #b91c1c !important;
+      background: #fee2e2 !important;
+      color: #7f1d1d;
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18) !important;
+      font-weight: 800;
+    }
+
+    .duplicate-cell {
+      background: #fee2e2;
+      color: #7f1d1d;
+      border-radius: 7px;
+      padding: 4px 6px;
+      font-weight: 800;
+    }
+
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-weight: 800;
+      white-space: nowrap;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+    }
+
+    .column-tools {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px;
+      margin: 12px 0;
+    }
+
+    .column-tools-title {
+      font-weight: 800;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .column-checks {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .column-checks label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .column-checks input {
+      width: auto;
+      min-height: 0;
+      padding: 0;
+    }
+
+    .is-hidden-col {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #111827;
+      color: white;
+      padding: 12px 14px;
+      border-radius: 8px;
+      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.25);
+      display: none;
+      max-width: min(420px, calc(100vw - 36px));
+      z-index: 20;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        height: auto;
+        position: static;
+        padding: 14px;
+      }
+      .brand { margin-bottom: 12px; }
+      .nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .nav button {
+        text-align: center;
+        padding: 10px 6px;
+        font-size: 13px;
+      }
+      .user-box { display: none; }
+      main { padding: 14px; }
+      .dashboard, .nas-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .nas-summary .stat { min-height: 86px; padding: 12px; }
+      .nas-summary .stat strong { font-size: 22px; }
+      .dashboard-toolbar { align-items: stretch; flex-direction: column; }
+      .period-selectors { align-items: stretch; }
+      .period-selectors select, .period-selectors input, .period-selectors button { width: 100%; }
+      .grid, .filters { grid-template-columns: 1fr; }
+      .sheet-filter-grid,
+      .sheet-filter-grid.nas-filter-grid { grid-template-columns: 1fr 1fr; }
+      .span-2 { grid-column: span 1; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      h1 { font-size: 22px; }
+
+      #nasView table,
+      #nasView thead,
+      #nasView tbody,
+      #nasView th,
+      #nasView td,
+      #nasView tr {
+        display: block;
+      }
+
+      #nasView thead { display: none; }
+      #nasView table { min-width: 0; }
+      #nasView .table-wrap {
+        border: 0;
+        overflow: visible;
+      }
+      #nasView tr {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        border-bottom: 10px solid var(--bg);
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      #nasView td {
+        border-bottom: 1px solid var(--line);
+        padding: 10px 0;
+      }
+      #nasView td::before {
+        content: attr(data-label);
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .bill-cell { min-width: 0; }
+      .bill-cell input, .bill-cell select { min-height: 42px; }
+      .nas-row-actions {
+        min-width: 0;
+      }
+      .row-total strong {
+        font-size: 24px;
+      }
+      .nas-table .badge.archive-ready,
+      .nas-table .badge.archive-wait {
+        width: 100%;
+        min-height: 40px;
+        border-radius: 8px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .sheet-filter-grid,
+      .sheet-filter-grid.nas-filter-grid { grid-template-columns: 1fr; }
+      .sheet-filter-shell { padding: 11px; }
+      .facet-row { display: grid; grid-template-columns: 1fr 1fr; }
+      details.facet > summary { justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <div class="login-panel">
+      <div class="login-brand">
+        <div class="logo">MY</div>
+        <div>
+          <strong>MYCENTER</strong>
+          <span>เข้าสู่ระบบเพื่อใช้งาน</span>
+        </div>
+      </div>
+      <div class="runtime-warning" id="runtimeWarning">
+        หน้านี้ต้องเปิดผ่าน URL ของ Google Apps Script Web app เท่านั้น ถ้าเปิดจากไฟล์ในเครื่อง ระบบจะเข้าสู่ระบบไม่ได้
+      </div>
+      <form id="loginForm">
+        <div class="grid">
+          <label class="required span-2">USER<input id="loginUsername" autocomplete="username" required></label>
+          <label class="required span-2">รหัสผ่าน<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">เข้าสู่ระบบ</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">MY</div>
+        <div>
+          <strong>MYCENTER</strong>
+          <span>Mobile & PC Web App</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="active" data-view="dashboard">แดชบอร์ด</button>
+        <button data-view="form">คีย์ข้อมูล</button>
+        <button data-view="search">ค้นหา</button>
+        <button data-view="nas">NAS</button>
+        <button data-view="users" id="usersNav" class="hidden">USER</button>
+      </nav>
+      <div class="user-box" id="userBox">กำลังโหลด...</div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <h1 id="pageTitle">แดชบอร์ด</h1>
+        <div class="top-actions">
+          <div class="role-pill" id="rolePill">...</div>
+          <button class="btn btn-ghost btn-small" id="logoutBtn" type="button">ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <section id="dashboardView">
+        <div class="dashboard-toolbar">
+          <div class="panel-title">ภาพรวมติดตั้ง</div>
+          <div class="period-tabs" id="dashboardPeriodTabs">
+            <button class="active" type="button" data-period="day">รายวัน</button>
+            <button type="button" data-period="week">รายสัปดาห์</button>
+            <button type="button" data-period="month">รายเดือน</button>
+            <button type="button" data-period="year">รายปี</button>
+          </div>
+          <div class="period-selectors">
+            <select id="dashboardMonth"></select>
+            <select id="dashboardYear"></select>
+            <input id="dashboardUserFilter" placeholder="กรอง USER">
+          </div>
+        </div>
+        <div class="dashboard" id="dashboardCards"></div>
+        <section class="panel">
+          <div class="dashboard-toolbar">
+            <div class="panel-title">รายการติดตาม</div>
+            <div class="export-actions">
+              <button class="btn btn-ghost btn-small" type="button" onclick="exportDashboardExcel()">โหลด Excel</button>
+              <button class="btn btn-ghost btn-small" type="button" onclick="exportDashboardPdf()">โหลด PDF</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>96xxx</th>
+                  <th>ชื่อ-นามสกุล</th>
+                  <th>วันที่ติดตั้ง</th>
+                  <th>Call Ver</th>
+                  <th>สถานะ</th>
+                  <th>เบอร์ลูกค้า</th>
+                  <th>USER</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecordsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel hidden" id="formView">
+        <div class="panel-title" id="formTitle">คีย์ข้อมูลใหม่</div>
+        <form id="recordForm">
+          <input type="hidden" id="recordId">
+          <div class="duplicate-warning" id="duplicateWarning"></div>
+          <div class="grid">
+            <label class="required">96xxx<input id="code96xxx" required placeholder="เช่น 96123"></label>
+            <label class="required">ชื่อ-นามสกุล<input id="customerName" required placeholder="ชื่อลูกค้า"></label>
+            <label>วันที่ติดตั้ง<input id="installDate" type="date"></label>
+            <label class="required">Call Ver Status<select id="callVerStatus" required></select></label>
+            <label>สถานะติดตั้ง<select id="installStatus"></select></label>
+            <label class="required">เบอร์โทรลูกค้า<input id="customerPhone" required inputmode="tel" placeholder="08x-xxx-xxxx"></label>
+            <label>USER ผู้คีย์<input id="createdByDisplay" disabled></label>
+            <label class="span-2">หมายเหตุ<textarea id="note" placeholder="รายละเอียดเพิ่มเติม"></textarea></label>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit" id="saveRecordBtn">บันทึกข้อมูล</button>
+            <button class="btn btn-ghost" type="button" id="resetFormBtn">ล้างฟอร์ม</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel hidden" id="searchView">
+        <div class="dashboard-toolbar">
+          <div>
+            <div class="panel-title">ค้นหาและแบ่งรายการตามเดือน</div>
+            <div class="nas-note">นับเดือนจากวันที่ติดตั้ง (InstallDate) และจัดกลุ่มให้อัตโนมัติ</div>
+          </div>
+          <div class="export-actions">
+            <button class="btn btn-primary btn-small" id="newRecordBtn" type="button">+ เพิ่มรายการใหม่</button>
+            <button class="btn btn-ghost btn-small" type="button" onclick="exportSearchExcel()">โหลด Excel</button>
+            <button class="btn btn-ghost btn-small" type="button" onclick="exportSearchPdf()">โหลด PDF</button>
+          </div>
+        </div>
+        <div class="sheet-filter-shell">
+          <div class="sheet-filter-head">
+            <div class="sheet-filter-title">ตัวกรองข้อมูล</div>
+            <div class="result-count" id="searchResultCount">0 รายการ</div>
+          </div>
+          <div class="sheet-filter-grid">
+            <label class="filter-label">ค้นหาทุกคอลัมน์<input id="keywordFilter" placeholder="96xxx, ชื่อ, เบอร์, หมายเหตุ"></label>
+            <label class="filter-label">ตั้งแต่วันที่<input id="searchDateFrom" type="date"></label>
+            <label class="filter-label">ถึงวันที่<input id="searchDateTo" type="date"></label>
+            <label class="filter-label">เดือนติดตั้ง<select id="searchMonth"></select></label>
+            <label class="filter-label">ปีติดตั้ง<select id="searchYear"></select></label>
+          </div>
+          <div class="facet-row" id="searchFacetFilters"></div>
+          <div class="facet-row">
+            <label class="filter-label">เรียงข้อมูล
+              <select id="searchSort">
+                <option value="date-desc">วันที่ติดตั้ง ใหม่ → เก่า</option>
+                <option value="date-asc">วันที่ติดตั้ง เก่า → ใหม่</option>
+                <option value="updated-desc">อัปเดตล่าสุด</option>
+                <option value="code-asc">96xxx น้อย → มาก</option>
+                <option value="name-asc">ชื่อ ก → ฮ</option>
+              </select>
+            </label>
+            <button class="btn btn-primary btn-small" id="searchBtn" type="button">ใช้ตัวกรอง</button>
+            <button class="btn btn-ghost btn-small" id="resetSearchFiltersBtn" type="button">ล้างตัวกรอง</button>
+            <div class="permission-note hidden" id="staffPermissionNote">STAFF แก้ไขรายการของตนเองได้ แต่เพิ่มหรือลบรายการไม่ได้</div>
+          </div>
+        </div>
+        <div class="month-strip" id="searchMonthChips" aria-label="เลือกเดือน"></div>
+        <div class="column-tools">
+          <div class="column-tools-title">เลือกคอลัมน์ที่ต้องการแสดง</div>
+          <div class="column-checks" id="searchColumnChecks"></div>
+          <div class="actions">
+            <button class="btn btn-ghost btn-small" type="button" onclick="resetSearchColumns()">แสดงทั้งหมด</button>
+            <button class="btn btn-ghost btn-small" type="button" onclick="clearSearchColumns()">ล้างที่เลือก</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>96xxx</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>วันที่ติดตั้ง</th>
+                <th>Call Ver</th>
+                <th>สถานะ</th>
+                <th>เบอร์ลูกค้า</th>
+                <th>USER</th>
+                <th>อัปเดต</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="hidden" id="nasView">
+        <div class="nas-layout">
+          <section class="nas-summary">
+            <div class="stat"><span>รายการ NAS</span><strong id="nasTotal">0</strong></div>
+            <div class="stat"><span>ยอดค้างชำระ</span><strong id="nasUnpaidAmount">0</strong></div>
+            <div class="stat"><span>ยอดรวมเดือนนี้</span><strong id="nasTotalAmount">0</strong></div>
+            <div class="stat"><span>ชำระแล้ว</span><strong id="nasPaidPercent">0%</strong></div>
+            <div class="stat"><span>ยังไม่ชำระ</span><strong id="nasUnpaidPercent">0%</strong></div>
+            <div class="stat"><span>ประวัติโทรของฉัน</span><strong id="nasCalls">0</strong></div>
+          </section>
+
+          <section class="panel">
+            <div class="dashboard-toolbar">
+              <div>
+                <div class="panel-title">NAS ติดตามบิล</div>
+                <div class="nas-note">ดึงเฉพาะรายการที่สถานะติดตั้งเป็น Completed เท่านั้น</div>
+              </div>
+              <div class="export-actions">
+                <button class="btn btn-ghost btn-small" type="button" onclick="exportNasExcel()">โหลด Excel</button>
+                <button class="btn btn-ghost btn-small" type="button" onclick="exportNasPdf()">โหลด PDF</button>
+              </div>
+            </div>
+            <div class="sheet-filter-shell">
+              <div class="sheet-filter-head">
+                <div class="sheet-filter-title">ตัวกรอง NAS แบบละเอียด</div>
+                <div class="result-count" id="nasResultCount">0 รายการ</div>
+              </div>
+              <div class="sheet-filter-grid nas-filter-grid">
+                <label class="filter-label">ค้นหาทุกคอลัมน์<input id="nasKeywordFilter" placeholder="96xxx, ชื่อ, เบอร์, บิล, จำนวนเงิน"></label>
+                <label class="filter-label">เดือนติดตั้ง<select id="nasMonth"></select></label>
+                <label class="filter-label">ปีติดตั้ง<select id="nasYear"></select></label>
+                <label class="filter-label">ยอดรวมขั้นต่ำ<input id="nasAmountMin" type="number" min="0" step="0.01" placeholder="0"></label>
+                <label class="filter-label">ยอดรวมสูงสุด<input id="nasAmountMax" type="number" min="0" step="0.01" placeholder="ไม่จำกัด"></label>
+              </div>
+              <div class="sheet-filter-grid nas-filter-grid" style="margin-top:10px">
+                <label class="filter-label">USER<input id="nasUserFilter" placeholder="กรอง USER"></label>
+                <label class="filter-label">กำหนดชำระตั้งแต่<input id="nasDueFrom" type="date"></label>
+                <label class="filter-label">กำหนดชำระถึง<input id="nasDueTo" type="date"></label>
+                <label class="filter-label">เรียงข้อมูล
+                  <select id="nasSort">
+                    <option value="date-desc">วันที่ติดตั้ง ใหม่ → เก่า</option>
+                    <option value="date-asc">วันที่ติดตั้ง เก่า → ใหม่</option>
+                    <option value="amount-desc">ยอดรวม มาก → น้อย</option>
+                    <option value="amount-asc">ยอดรวม น้อย → มาก</option>
+                    <option value="name-asc">ชื่อ ก → ฮ</option>
+                  </select>
+                </label>
+                <div class="actions" style="margin-top:0">
+                  <button class="btn btn-primary btn-small" type="button" onclick="loadNas()">ใช้ตัวกรอง</button>
+                  <button class="btn btn-ghost btn-small" id="resetNasFiltersBtn" type="button">ล้างตัวกรอง</button>
+                </div>
+              </div>
+              <div class="facet-row" id="nasFacetFilters"></div>
+            </div>
+            <div class="column-tools">
+              <div class="column-tools-title">เลือกคอลัมน์ NAS ที่ต้องการแสดง</div>
+              <div class="column-checks" id="nasColumnChecks"></div>
+              <div class="actions">
+                <button class="btn btn-ghost btn-small" type="button" onclick="resetNasColumns()">แสดงทั้งหมด</button>
+                <button class="btn btn-ghost btn-small" type="button" onclick="clearNasColumns()">ล้างที่เลือก</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="nas-table">
+                <colgroup>
+                  <col class="code-col">
+                  <col class="name-col">
+                  <col class="date-col">
+                  <col class="phone-col">
+                  <col class="user-col">
+                  <col class="bill-col">
+                  <col class="bill-col">
+                  <col class="bill-col">
+                  <col class="bill-col">
+                  <col class="archive-col">
+                  <col class="action-col">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>96xxx</th>
+                    <th>ชื่อ-นามสกุล</th>
+                    <th>วันที่ติดตั้ง</th>
+                    <th>เบอร์โทรลูกค้า</th>
+                    <th>USER</th>
+                    <th>บิล1</th>
+                    <th>บิล2</th>
+                    <th>บิล3</th>
+                    <th>บิล4</th>
+                    <th>จัดเก็บไฟล์</th>
+                    <th>จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="nasBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title" id="callLogsTitle">ประวัติการโทรของฉัน</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>เวลาโทร</th>
+                    <th>USER</th>
+                    <th>96xxx</th>
+                    <th>ชื่อ-นามสกุล</th>
+                    <th>เบอร์โทรลูกค้า</th>
+                  </tr>
+                </thead>
+                <tbody id="callLogsBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="usersView">
+        <div class="panel-title">จัดการ USER</div>
+        <form id="userForm">
+          <div class="grid">
+            <label class="required">USER<input id="userUsername" required autocomplete="off"></label>
+            <label>ชื่อ<input id="userName" placeholder="ชื่อพนักงาน"></label>
+            <label>ชื่อเล่น<input id="userNickname" placeholder="ชื่อเล่น เช่น น้องเอ"></label>
+            <label class="required">ตำแหน่ง<select id="userRole" required></select></label>
+            <label>รหัสผ่าน<input id="userPassword" type="password" autocomplete="new-password"></label>
+            <label>เปิดใช้งาน<select id="userActive"><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select></label>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">บันทึก USER</button>
+            <button class="btn btn-ghost" type="button" id="clearUserBtn">ล้างฟอร์ม</button>
+            <button class="btn btn-ghost" type="button" id="repairSystemBtn">ตรวจ/ซ่อมข้อมูลระบบ</button>
+          </div>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>USER</th>
+                <th>ชื่อ</th>
+                <th>ชื่อเล่น</th>
+                <th>ตำแหน่ง</th>
+                <th>Active</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    installNetlifyAppsScriptBridge();
+
+    function installNetlifyAppsScriptBridge() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) return;
+      if (window.location.protocol === 'file:') return;
+      const endpoint = '/.netlify/functions/apps-script';
+      const createRunner = (successHandler, failureHandler) => new Proxy({}, {
+        get(target, prop) {
+          if (prop === 'withSuccessHandler') {
+            return handler => createRunner(handler, failureHandler);
+          }
+          if (prop === 'withFailureHandler') {
+            return handler => createRunner(successHandler, handler);
+          }
+          return (...args) => {
+            fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fn: String(prop), args })
+            })
+              .then(response => response.json())
+              .then(result => {
+                if (!result.ok) throw new Error(result.error || 'Server error');
+                if (successHandler) successHandler(result.data);
+              })
+              .catch(error => {
+                if (failureHandler) {
+                  failureHandler(error);
+                } else {
+                  throw error;
+                }
+              });
+          };
+        }
+      });
+      window.google = { script: { run: createRunner(null, null) } };
+    }
+
+    const state = {
+      token: localStorage.getItem('mycenter_token') || '',
+      user: null,
+      options: { callVerStatuses: [], installStatuses: [], billStatuses: [], roles: [] },
+      allRecords: [],
+      records: [],
+      nas: [],
+      nasSummary: {
+        totalJobs: 0,
+        totalBills: 0,
+        paidBills: 0,
+        unpaidBills: 0,
+        totalAmount: 0,
+        unpaidAmount: 0,
+        paidPercent: 0,
+        unpaidPercent: 0
+      },
+      callLogs: [],
+      users: [],
+      nasCache: {},
+      loadingNas: false,
+      loadingUsers: false,
+      savingRecord: false,
+      searchColumns: ['code', 'name', 'date', 'callver', 'status', 'phone', 'user'],
+      nasColumns: ['code', 'name', 'date', 'phone', 'user', 'bill1', 'bill2', 'bill3', 'bill4', 'archive'],
+      searchFilter: {
+        keyword: '', dateFrom: '', dateTo: '', month: '', year: '',
+        statuses: [], callVerStatuses: [], users: [], sort: 'date-desc'
+      },
+      nasFilter: {
+        billStatuses: [], archiveStatuses: [], users: [], dueFrom: '', dueTo: '',
+        amountMin: '', amountMax: '', sort: 'date-desc'
+      },
+      dashboard: { total: 0, counts: {}, records: [] },
+      dashboardPeriod: 'day',
+      dashboardMonth: new Date().getMonth() + 1,
+      dashboardYear: new Date().getFullYear()
+    };
+
+    const $ = id => document.getElementById(id);
+    const views = ['dashboard', 'form', 'search', 'nas', 'users'];
+    const THAI_MONTHS = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+      bindEvents();
+      showRuntimeWarningIfNeeded();
+      if (state.token) {
+        loadBootstrap();
+      } else {
+        showLogin();
+      }
+    }
+
+    function bindEvents() {
+      $('loginForm').addEventListener('submit', doLogin);
+      $('logoutBtn').addEventListener('click', doLogout);
+      document.querySelectorAll('.nav button').forEach(button => {
+        button.addEventListener('click', () => showView(button.dataset.view));
+      });
+      document.querySelectorAll('#dashboardPeriodTabs button').forEach(button => {
+        button.addEventListener('click', () => loadDashboard(button.dataset.period));
+      });
+      $('dashboardMonth').addEventListener('change', () => {
+        state.dashboardMonth = Number($('dashboardMonth').value);
+        loadDashboard(state.dashboardPeriod);
+      });
+      $('dashboardYear').addEventListener('change', () => {
+        state.dashboardYear = Number($('dashboardYear').value);
+        loadDashboard(state.dashboardPeriod);
+      });
+      $('dashboardUserFilter').addEventListener('change', () => loadDashboard(state.dashboardPeriod));
+      $('nasKeywordFilter').addEventListener('input', () => renderNas());
+      $('nasUserFilter').addEventListener('change', () => loadNas());
+      $('nasMonth').addEventListener('change', () => loadNas());
+      $('nasYear').addEventListener('change', () => loadNas());
+      ['nasAmountMin', 'nasAmountMax', 'nasDueFrom', 'nasDueTo', 'nasSort'].forEach(id => {
+        $(id).addEventListener(id === 'nasSort' ? 'change' : 'input', () => renderNas());
+      });
+      $('resetNasFiltersBtn').addEventListener('click', resetNasFilters);
+      $('recordForm').addEventListener('submit', saveRecord);
+      $('resetFormBtn').addEventListener('click', resetRecordForm);
+      ['code96xxx', 'customerName', 'customerPhone'].forEach(id => {
+        $(id).addEventListener('input', updateDuplicateWarning);
+      });
+      $('searchBtn').addEventListener('click', searchRecords);
+      ['keywordFilter', 'searchDateFrom', 'searchDateTo'].forEach(id => {
+        $(id).addEventListener('input', applySearchFilters);
+      });
+      ['searchMonth', 'searchYear', 'searchSort'].forEach(id => {
+        $(id).addEventListener('change', applySearchFilters);
+      });
+      $('resetSearchFiltersBtn').addEventListener('click', resetSearchFilters);
+      $('newRecordBtn').addEventListener('click', () => {
+        if (isStaff()) {
+          toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น ไม่สามารถเพิ่มรายการใหม่ได้');
+          return;
+        }
+        resetRecordForm();
+        showView('form');
+      });
+      $('userForm').addEventListener('submit', saveUser);
+      $('clearUserBtn').addEventListener('click', clearUserForm);
+      $('repairSystemBtn').addEventListener('click', repairSystemData);
+    }
+
+    function doLogin(event) {
+      event.preventDefault();
+      if (!hasAppsScriptRuntime()) {
+        toast('กรุณาเปิดผ่าน URL ของ Google Apps Script Web app ไม่ใช่เปิดไฟล์ Index.html จากเครื่อง');
+        showRuntimeWarningIfNeeded();
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(result => {
+          state.token = result.token;
+          localStorage.setItem('mycenter_token', state.token);
+          applyBootstrap(result.bootstrap);
+          showApp();
+          showView('dashboard');
+        })
+        .withFailureHandler(showError)
+        .login({ username: $('loginUsername').value, password: $('loginPassword').value });
+    }
+
+    function doLogout() {
+      const token = state.token;
+      localStorage.removeItem('mycenter_token');
+      state.token = '';
+      state.user = null;
+      showLogin();
+      if (token) google.script.run.logout(token);
+    }
+
+    function loadBootstrap() {
+      if (!hasAppsScriptRuntime()) {
+        localStorage.removeItem('mycenter_token');
+        state.token = '';
+        showLogin();
+        showRuntimeWarningIfNeeded();
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(data => {
+          applyBootstrap(data);
+          showApp();
+          showView('dashboard');
+        })
+        .withFailureHandler(() => {
+          localStorage.removeItem('mycenter_token');
+          state.token = '';
+          showLogin();
+        })
+        .getBootstrapData(state.token);
+    }
+
+    function applyBootstrap(data) {
+      Object.assign(state, data);
+      state.allRecords = data.records || [];
+      state.records = data.records || [];
+      state.nasSummary = data.nasSummary || buildLocalNasSummary();
+      hydrateOptions();
+      hydrateDashboardPeriodSelectors();
+      renderColumnTools();
+      renderAll();
+      resetRecordForm();
+    }
+
+    function showLogin() {
+      $('loginScreen').classList.remove('hidden');
+      $('appShell').classList.add('hidden');
+      $('loginPassword').value = '';
+    }
+
+    function showApp() {
+      $('loginScreen').classList.add('hidden');
+      $('appShell').classList.remove('hidden');
+    }
+
+    function hasAppsScriptRuntime() {
+      return typeof google !== 'undefined' && google.script && google.script.run;
+    }
+
+    function showRuntimeWarningIfNeeded() {
+      const warning = $('runtimeWarning');
+      if (!warning) return;
+      warning.style.display = hasAppsScriptRuntime() ? 'none' : 'block';
+    }
+
+    function hydrateOptions() {
+      fillSelect($('callVerStatus'), state.options.callVerStatuses, 'เลือก Call Ver Status');
+      fillSelect($('installStatus'), state.options.installStatuses, '');
+      fillSelect($('userRole'), state.options.roles, '');
+      $('dashboardUserFilter').disabled = !canSeeAll();
+      $('nasUserFilter').disabled = !canSeeAll();
+    }
+
+    function hydrateDashboardPeriodSelectors() {
+      $('dashboardMonth').innerHTML = THAI_MONTHS.map((name, index) => `<option value="${index + 1}">${name}</option>`).join('');
+
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let year = currentYear - 5; year <= currentYear + 2; year++) years.push(year);
+      $('dashboardYear').innerHTML = years.map(year => `<option value="${year}">${year + 543}</option>`).join('');
+      $('dashboardMonth').value = state.dashboardMonth;
+      $('dashboardYear').value = state.dashboardYear;
+      $('nasMonth').innerHTML = $('dashboardMonth').innerHTML;
+      $('nasYear').innerHTML = $('dashboardYear').innerHTML;
+      $('nasMonth').value = state.dashboardMonth;
+      $('nasYear').value = state.dashboardYear;
+
+      $('searchMonth').innerHTML = '<option value="">ทุกเดือน</option>' + $('dashboardMonth').innerHTML;
+      $('searchYear').innerHTML = '<option value="">ทุกปี</option>' + $('dashboardYear').innerHTML;
+      $('searchMonth').value = state.searchFilter.month;
+      $('searchYear').value = state.searchFilter.year;
+
+      $('nasMonth').insertAdjacentHTML('afterbegin', '<option value="0">ทุกเดือน</option>');
+      $('nasYear').insertAdjacentHTML('afterbegin', '<option value="0">ทุกปี</option>');
+    }
+
+    function fillSelect(select, items, firstLabel) {
+      select.innerHTML = '';
+      if (firstLabel !== '') {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = firstLabel;
+        select.appendChild(option);
+      }
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+      });
+    }
+
+    function renderColumnTools() {
+      renderColumnChecks('searchColumnChecks', searchColumnDefinitions(), state.searchColumns, toggleSearchColumn);
+      renderColumnChecks('nasColumnChecks', nasColumnDefinitions(), state.nasColumns, toggleNasColumn);
+    }
+
+    function renderFilterFacets() {
+      const recordUsers = uniqueValues(state.allRecords, 'OwnerUsername');
+      const nasUsers = uniqueValues(state.nas, 'OwnerUsername');
+      renderFacetFilters('searchFacetFilters', [
+        { key: 'statuses', label: 'สถานะติดตั้ง', values: state.options.installStatuses },
+        { key: 'callVerStatuses', label: 'Call Ver', values: state.options.callVerStatuses },
+        { key: 'users', label: 'USER', values: canSeeAll() ? recordUsers : [state.user && state.user.username].filter(Boolean) }
+      ], state.searchFilter, applySearchFilters);
+      renderFacetFilters('nasFacetFilters', [
+        { key: 'billStatuses', label: 'สถานะบิล', values: state.options.billStatuses },
+        { key: 'archiveStatuses', label: 'จัดเก็บไฟล์', values: ['รอติดตามบิล', 'จัดเก็บไฟล์ได้'] },
+        { key: 'users', label: 'USER', values: canSeeAll() ? nasUsers : [state.user && state.user.username].filter(Boolean) }
+      ], state.nasFilter, renderNas);
+    }
+
+    function renderFacetFilters(containerId, definitions, filterState, onChange) {
+      const container = $(containerId);
+      if (!container) return;
+      container.innerHTML = definitions.map(definition => {
+        const selected = filterState[definition.key] || [];
+        const values = [...new Set((definition.values || []).filter(Boolean).map(String))];
+        return `
+          <details class="facet" data-facet-key="${escapeAttr(definition.key)}">
+            <summary>
+              ${escapeHtml(definition.label)}
+              <span class="facet-badge ${selected.length ? '' : 'hidden'}">${selected.length}</span>
+            </summary>
+            <div class="facet-menu">
+              ${values.length ? values.map(value => `
+                <label>
+                  <input type="checkbox" data-facet="${escapeAttr(definition.key)}" value="${escapeAttr(value)}" ${selected.includes(value) ? 'checked' : ''}>
+                  <span>${escapeHtml(value)}</span>
+                </label>
+              `).join('') : '<div class="nas-note" style="margin:8px">ไม่มีตัวเลือก</div>'}
+            </div>
+          </details>
+        `;
+      }).join('');
+      container.querySelectorAll('input[data-facet]').forEach(input => {
+        input.addEventListener('change', () => {
+          const key = input.dataset.facet;
+          const checked = [...container.querySelectorAll(`input[data-facet="${key}"]:checked`)].map(node => node.value);
+          filterState[key] = checked;
+          const details = input.closest('details');
+          const badge = details && details.querySelector('.facet-badge');
+          if (badge) {
+            badge.textContent = checked.length;
+            badge.classList.toggle('hidden', !checked.length);
+          }
+          onChange();
+        });
+      });
+    }
+
+    function uniqueValues(rows, key) {
+      return [...new Set((rows || []).map(row => String(row[key] || '').trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'th'));
+    }
+
+    function renderColumnChecks(containerId, columns, selected, toggleFn) {
+      const container = $(containerId);
+      if (!container) return;
+      container.innerHTML = columns.map(column => `
+        <label>
+          <input type="checkbox" value="${escapeAttr(column.key)}" ${selected.includes(column.key) ? 'checked' : ''}>
+          ${escapeHtml(column.label)}
+        </label>
+      `).join('');
+      container.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', () => toggleFn(input.value, input.checked));
+      });
+    }
+
+    function searchColumnDefinitions() {
+      return [
+        { key: 'code', label: '96xxx' },
+        { key: 'name', label: 'ชื่อ-นามสกุล' },
+        { key: 'date', label: 'วันที่ติดตั้ง' },
+        { key: 'callver', label: 'Call Ver' },
+        { key: 'status', label: 'สถานะ' },
+        { key: 'phone', label: 'เบอร์ลูกค้า' },
+        { key: 'user', label: 'USER' }
+      ];
+    }
+
+    function nasColumnDefinitions() {
+      return [
+        { key: 'code', label: '96xxx' },
+        { key: 'name', label: 'ชื่อ-นามสกุล' },
+        { key: 'date', label: 'วันที่ติดตั้ง' },
+        { key: 'phone', label: 'เบอร์โทรลูกค้า' },
+        { key: 'user', label: 'USER' },
+        { key: 'bill1', label: 'บิล1' },
+        { key: 'bill2', label: 'บิล2' },
+        { key: 'bill3', label: 'บิล3' },
+        { key: 'bill4', label: 'บิล4' },
+        { key: 'archive', label: 'จัดเก็บไฟล์' }
+      ];
+    }
+
+    function toggleSearchColumn(key, checked) {
+      state.searchColumns = checked
+        ? [...new Set([...state.searchColumns, key])]
+        : state.searchColumns.filter(item => item !== key);
+      renderRecords();
+    }
+
+    function toggleNasColumn(key, checked) {
+      state.nasColumns = checked
+        ? [...new Set([...state.nasColumns, key])]
+        : state.nasColumns.filter(item => item !== key);
+      renderNas();
+    }
+
+    function resetSearchColumns() {
+      state.searchColumns = searchColumnDefinitions().map(item => item.key);
+      renderColumnTools();
+      renderRecords();
+    }
+
+    function clearSearchColumns() {
+      state.searchColumns = [];
+      renderColumnTools();
+      renderRecords();
+    }
+
+    function resetNasColumns() {
+      state.nasColumns = nasColumnDefinitions().map(item => item.key);
+      renderColumnTools();
+      renderNas();
+    }
+
+    function clearNasColumns() {
+      state.nasColumns = [];
+      renderColumnTools();
+      renderNas();
+    }
+
+    function showView(view) {
+      if (view === 'form' && isStaff() && !$('recordId').value) {
+        toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น กรุณาเลือกรายการจากหน้าค้นหา');
+        view = 'search';
+      }
+      views.forEach(name => $(`${name}View`).classList.toggle('hidden', name !== view));
+      document.querySelectorAll('.nav button').forEach(button => {
+        button.classList.toggle('active', button.dataset.view === view);
+      });
+      const titles = {
+        dashboard: 'แดชบอร์ด',
+        form: $('recordId').value ? 'แก้ไขข้อมูล' : 'คีย์ข้อมูลใหม่',
+        search: 'ค้นหาข้อมูล',
+        nas: 'NAS',
+        users: 'จัดการ USER'
+      };
+      $('pageTitle').textContent = titles[view];
+      if (view === 'nas') loadNas();
+      if (view === 'users') loadUsers();
+    }
+
+    function renderAll() {
+      renderUser();
+      renderDashboard();
+      renderFilterFacets();
+      applySearchFilters();
+      renderNas();
+      renderUsers();
+    }
+
+    function renderUser() {
+      $('rolePill').textContent = state.user.role;
+      $('userBox').innerHTML = `<strong>${escapeHtml(state.user.name)}</strong><br>USER: ${escapeHtml(state.user.username)}`;
+      $('usersNav').classList.toggle('hidden', state.user.role !== 'ADMIN');
+      const formNav = document.querySelector('.nav button[data-view="form"]');
+      if (formNav) formNav.classList.toggle('hidden', isStaff());
+      $('newRecordBtn').classList.toggle('hidden', isStaff());
+      $('staffPermissionNote').classList.toggle('hidden', !isStaff());
+    }
+
+    function renderDashboard() {
+      state.dashboardPeriod = state.dashboard.period || state.dashboardPeriod || 'day';
+      state.dashboardMonth = Number(state.dashboard.month || state.dashboardMonth || new Date().getMonth() + 1);
+      state.dashboardYear = Number(state.dashboard.year || state.dashboardYear || new Date().getFullYear());
+      $('dashboardMonth').value = state.dashboardMonth;
+      $('dashboardYear').value = state.dashboardYear;
+      document.querySelectorAll('#dashboardPeriodTabs button').forEach(button => {
+        button.classList.toggle('active', button.dataset.period === state.dashboardPeriod);
+      });
+
+      const cards = [
+        ['ทั้งหมด', state.dashboard.total, ''],
+        ...state.options.installStatuses.map(status => [status, state.dashboard.counts[status] || 0, status])
+      ];
+      $('dashboardCards').innerHTML = cards.map(([label, value, className]) => `
+        <div class="stat">
+          <span>${escapeHtml(label)}</span>
+          <strong class="${className}">${value}</strong>
+        </div>
+      `).join('');
+      renderDashboardRecords();
+    }
+
+    function renderDashboardRecords() {
+      const body = $('dashboardRecordsBody');
+      const records = state.dashboard.records || [];
+      if (!records.length) {
+        body.innerHTML = '<tr><td colspan="8">ไม่พบข้อมูลในช่วงเวลานี้</td></tr>';
+        return;
+      }
+      body.innerHTML = records.map(record => `
+        <tr>
+          <td>${escapeHtml(record.Code96xxx)}</td>
+          <td>${escapeHtml(record.CustomerName)}</td>
+          <td>${escapeHtml(record.InstallDate)}</td>
+          <td>${escapeHtml(record.CallVerStatus)}</td>
+          <td><span class="badge ${escapeHtml(record.InstallStatus)}">${escapeHtml(record.InstallStatus)}</span></td>
+          <td>${escapeHtml(record.CustomerPhone)}</td>
+          <td>${escapeHtml(record.OwnerUsername)}</td>
+          <td>${recordActionButtons(record)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function loadDashboard(period) {
+      state.dashboardPeriod = period || state.dashboardPeriod || 'day';
+      google.script.run
+        .withSuccessHandler(dashboard => {
+          state.dashboard = dashboard;
+          renderDashboard();
+        })
+        .withFailureHandler(showError)
+        .getDashboard(state.token, getDashboardPeriodPayload());
+    }
+
+    function recordActionButtons(record) {
+      const edit = `<button class="btn btn-ghost btn-small" type="button" onclick="editRecord('${escapeAttr(record.ID)}')">แก้ไข</button>`;
+      const remove = isStaff() ? '' : `<button class="btn btn-danger btn-small" type="button" onclick="removeRecord('${escapeAttr(record.ID)}')">ลบ</button>`;
+      return `<div class="top-actions">${edit}${remove}</div>`;
+    }
+
+    function renderRecords() {
+      const body = $('recordsBody');
+      const table = body.closest('table');
+      const columns = searchColumnDefinitions().filter(column => state.searchColumns.includes(column.key));
+      const headers = [
+        ...columns.map(column => `<th>${escapeHtml(column.label)}</th>`),
+        '<th>อัปเดต</th>',
+        '<th>จัดการ</th>'
+      ].join('');
+      table.querySelector('thead').innerHTML = `<tr>${headers}</tr>`;
+      $('searchResultCount').textContent = `${state.records.length.toLocaleString('th-TH')} รายการ`;
+      renderSearchMonthChips();
+      if (!state.records.length) {
+        body.innerHTML = `<tr><td class="empty-state" colspan="${columns.length + 2}">ไม่พบข้อมูลที่ตรงกับตัวกรอง</td></tr>`;
+        return;
+      }
+      const groups = groupRecordsByMonth(state.records);
+      body.innerHTML = groups.map(group => `
+        <tr class="month-group-row">
+          <td colspan="${columns.length + 2}">
+            <div class="month-group-content">
+              <span>${escapeHtml(group.label)}</span>
+              <span>${group.records.length.toLocaleString('th-TH')} รายการ</span>
+            </div>
+          </td>
+        </tr>
+        ${group.records.map(record => `
+          <tr>
+            ${columns.map(column => renderRecordColumn(record, column.key)).join('')}
+            <td>${escapeHtml(record.UpdatedAt || record.CreatedAt)}</td>
+            <td>${recordActionButtons(record)}</td>
+          </tr>
+        `).join('')}
+      `).join('');
+    }
+
+    function groupRecordsByMonth(records) {
+      const groups = new Map();
+      records.forEach(record => {
+        const match = String(record.InstallDate || '').match(/^(\d{4})-(\d{2})/);
+        const key = match ? `${match[1]}-${match[2]}` : 'undated';
+        if (!groups.has(key)) {
+          const label = match
+            ? `${THAI_MONTHS[Number(match[2]) - 1]} ${Number(match[1]) + 543}`
+            : 'ไม่ระบุวันที่ติดตั้ง';
+          groups.set(key, { key, label, records: [] });
+        }
+        groups.get(key).records.push(record);
+      });
+      return [...groups.values()];
+    }
+
+    function renderSearchMonthChips() {
+      const container = $('searchMonthChips');
+      if (!container) return;
+      const filter = Object.assign({}, getSearchFilter(), { month: '' });
+      const rows = filterLocalRecords(state.allRecords, filter);
+      const counts = Array(12).fill(0);
+      rows.forEach(record => {
+        const match = String(record.InstallDate || '').match(/^\d{4}-(\d{2})/);
+        if (match) counts[Number(match[1]) - 1]++;
+      });
+      const selected = String($('searchMonth').value || '');
+      container.innerHTML = `
+        <button class="month-chip ${selected ? '' : 'active'}" type="button" data-month="">ทุกเดือน <small>${rows.length}</small></button>
+        ${THAI_MONTHS.map((name, index) => `
+          <button class="month-chip ${selected === String(index + 1) ? 'active' : ''}" type="button" data-month="${index + 1}">
+            ${escapeHtml(name)} <small>${counts[index]}</small>
+          </button>
+        `).join('')}
+      `;
+      container.querySelectorAll('button[data-month]').forEach(button => {
+        button.addEventListener('click', () => {
+          $('searchMonth').value = button.dataset.month;
+          applySearchFilters();
+        });
+      });
+    }
+
+    function renderRecordColumn(record, key) {
+      const duplicate = getDuplicateFields(record, state.allRecords);
+      const cellClass = field => duplicate.includes(field) ? 'duplicate-cell' : '';
+      const map = {
+        code: `<span class="${cellClass('code')}">${escapeHtml(record.Code96xxx)}</span>`,
+        name: `<span class="${cellClass('name')}">${escapeHtml(record.CustomerName)}</span>`,
+        date: escapeHtml(record.InstallDate),
+        callver: escapeHtml(record.CallVerStatus),
+        status: `<span class="badge ${escapeHtml(record.InstallStatus)}">${escapeHtml(record.InstallStatus)}</span>`,
+        phone: `<span class="${cellClass('phone')}">${escapeHtml(record.CustomerPhone)}</span>`,
+        user: userBadge(record.OwnerUsername)
+      };
+      return `<td>${map[key] || ''}</td>`;
+    }
+
+    function renderNas() {
+      const nasRows = filterNasRows(state.nas);
+      const summary = buildNasSummaryFromRows(nasRows);
+      $('nasResultCount').textContent = `${nasRows.length.toLocaleString('th-TH')} รายการ`;
+      $('nasTotal').textContent = summary.totalJobs || nasRows.length;
+      $('nasUnpaidAmount').textContent = formatMoney(summary.unpaidAmount);
+      $('nasTotalAmount').textContent = formatMoney(summary.totalAmount);
+      $('nasPaidPercent').textContent = `${summary.paidPercent || 0}%`;
+      $('nasUnpaidPercent').textContent = `${summary.unpaidPercent || 0}%`;
+      $('nasCalls').textContent = state.callLogs.length;
+      $('callLogsTitle').textContent = canSeeAll() ? 'ประวัติการโทรทั้งหมด' : 'ประวัติการโทรของฉัน';
+
+      const body = $('nasBody');
+      const table = body.closest('table');
+      const columns = nasColumnDefinitions().filter(column => state.nasColumns.includes(column.key));
+      table.querySelector('thead').innerHTML = `
+        <tr>
+          ${columns.map(column => `<th>${escapeHtml(column.label)}</th>`).join('')}
+          <th>จัดการ</th>
+        </tr>
+      `;
+      if (!nasRows.length) {
+        body.innerHTML = `<tr><td colspan="${columns.length + 1}">ไม่มีรายการ Completed สำหรับ NAS</td></tr>`;
+      } else {
+        body.innerHTML = nasRows.map(item => `
+          <tr>
+            ${columns.map(column => renderNasColumn(item, column)).join('')}
+            <td data-label="จัดการ">
+              <div class="nas-row-actions">
+                <div class="row-total">
+                  <span>TOTAL</span>
+                  <strong id="nas-${escapeAttr(item.ID)}-total">${formatMoney(rowBillTotal(item))}</strong>
+                </div>
+                <button class="btn btn-primary btn-small" type="button" onclick="saveNasBilling('${escapeAttr(item.ID)}')">บันทึกบิล</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      const logsBody = $('callLogsBody');
+      if (!state.callLogs.length) {
+        logsBody.innerHTML = '<tr><td colspan="5">ยังไม่มีประวัติการโทร</td></tr>';
+        return;
+      }
+      logsBody.innerHTML = state.callLogs.map(log => `
+        <tr>
+          <td>${escapeHtml(log.CalledAt)}</td>
+          <td>${userBadge(log.Username, log.UserNickname)}</td>
+          <td>${escapeHtml(log.Code96xxx)}</td>
+          <td>${escapeHtml(log.CustomerName || '')}</td>
+          <td>${escapeHtml(log.CustomerPhone)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filterNasRows(rows) {
+      const keyword = String($('nasKeywordFilter') ? $('nasKeywordFilter').value : '').trim().toLowerCase();
+      state.nasFilter.dueFrom = $('nasDueFrom').value;
+      state.nasFilter.dueTo = $('nasDueTo').value;
+      state.nasFilter.amountMin = $('nasAmountMin').value;
+      state.nasFilter.amountMax = $('nasAmountMax').value;
+      state.nasFilter.sort = $('nasSort').value;
+      const filter = state.nasFilter;
+
+      const filtered = rows.filter(item => {
+        if (keyword && ![
+          item.Code96xxx, item.CustomerName, item.InstallDate, item.CustomerPhone, item.OwnerUsername,
+          item.Bill1Status, item.Bill1DueDate, item.Bill1Amount,
+          item.Bill2Status, item.Bill2DueDate, item.Bill2Amount,
+          item.Bill3Status, item.Bill3DueDate, item.Bill3Amount,
+          item.Bill4Status, item.Bill4DueDate, item.Bill4Amount,
+          item.ArchiveStatus
+        ].join(' ').toLowerCase().includes(keyword)) return false;
+
+        if (filter.users.length && !filter.users.includes(String(item.OwnerUsername || ''))) return false;
+        const billStatuses = [1, 2, 3, 4].map(index => String(item[`Bill${index}Status`] || ''));
+        if (filter.billStatuses.length && !billStatuses.some(status => filter.billStatuses.includes(status))) return false;
+        const archive = String(item.ArchiveStatus || archiveStatus(item));
+        if (filter.archiveStatuses.length && !filter.archiveStatuses.includes(archive)) return false;
+
+        const dueDates = [1, 2, 3, 4].map(index => String(item[`Bill${index}DueDate`] || '').slice(0, 10)).filter(Boolean);
+        if ((filter.dueFrom || filter.dueTo) && !dueDates.some(date => {
+          if (filter.dueFrom && date < filter.dueFrom) return false;
+          if (filter.dueTo && date > filter.dueTo) return false;
+          return true;
+        })) return false;
+
+        const total = rowBillTotal(item);
+        if (filter.amountMin !== '' && total < Number(filter.amountMin)) return false;
+        if (filter.amountMax !== '' && total > Number(filter.amountMax)) return false;
+        return true;
+      });
+
+      const comparators = {
+        'date-desc': (a, b) => String(b.InstallDate || '').localeCompare(String(a.InstallDate || '')),
+        'date-asc': (a, b) => String(a.InstallDate || '').localeCompare(String(b.InstallDate || '')),
+        'amount-desc': (a, b) => rowBillTotal(b) - rowBillTotal(a),
+        'amount-asc': (a, b) => rowBillTotal(a) - rowBillTotal(b),
+        'name-asc': (a, b) => String(a.CustomerName || '').localeCompare(String(b.CustomerName || ''), 'th')
+      };
+      return filtered.sort(comparators[filter.sort] || comparators['date-desc']);
+    }
+
+    function resetNasFilters() {
+      state.nasFilter = {
+        billStatuses: [], archiveStatuses: [], users: [], dueFrom: '', dueTo: '',
+        amountMin: '', amountMax: '', sort: 'date-desc'
+      };
+      $('nasKeywordFilter').value = '';
+      $('nasUserFilter').value = '';
+      $('nasMonth').value = String(new Date().getMonth() + 1);
+      $('nasYear').value = String(new Date().getFullYear());
+      $('nasAmountMin').value = '';
+      $('nasAmountMax').value = '';
+      $('nasDueFrom').value = '';
+      $('nasDueTo').value = '';
+      $('nasSort').value = 'date-desc';
+      renderFilterFacets();
+      loadNas(true);
+    }
+
+    function renderNasColumn(item, column) {
+      const duplicate = getDuplicateFields(item, state.nas);
+      const cellClass = field => duplicate.includes(field) ? 'duplicate-cell' : '';
+      const map = {
+        code: `<td data-label="${escapeAttr(column.label)}"><span class="text-strong nowrap ${cellClass('code')}">${escapeHtml(item.Code96xxx)}</span></td>`,
+        name: `<td data-label="${escapeAttr(column.label)}"><span class="${cellClass('name')}">${escapeHtml(item.CustomerName)}</span></td>`,
+        date: `<td data-label="${escapeAttr(column.label)}"><span class="nowrap">${escapeHtml(item.InstallDate)}</span></td>`,
+        phone: `<td data-label="${escapeAttr(column.label)}"><a class="phone-link ${cellClass('phone')}" href="tel:${escapeAttr(normalizePhone(item.CustomerPhone))}" onclick="callCustomer('${escapeAttr(item.ID)}'); return false;">${escapeHtml(item.CustomerPhone)}</a></td>`,
+        user: `<td data-label="${escapeAttr(column.label)}">${userBadge(item.OwnerUsername)}</td>`,
+        bill1: `<td data-label="${escapeAttr(column.label)}">${billControl(item, 1)}</td>`,
+        bill2: `<td data-label="${escapeAttr(column.label)}">${billControl(item, 2)}</td>`,
+        bill3: `<td data-label="${escapeAttr(column.label)}">${billControl(item, 3)}</td>`,
+        bill4: `<td data-label="${escapeAttr(column.label)}">${billControl(item, 4)}</td>`,
+        archive: `<td data-label="${escapeAttr(column.label)}"><span class="badge ${archiveClass(item.ArchiveStatus)}">${escapeHtml(item.ArchiveStatus || archiveStatus(item))}</span></td>`
+      };
+      return map[column.key] || '';
+    }
+
+    function billControl(item, index) {
+      const statusKey = `Bill${index}Status`;
+      const dueKey = `Bill${index}DueDate`;
+      const amountKey = `Bill${index}Amount`;
+      const options = state.options.billStatuses.map(status => `
+        <option value="${escapeAttr(status)}" ${item[statusKey] === status ? 'selected' : ''}>${escapeHtml(status)}</option>
+      `).join('');
+      return `
+        <div class="bill-cell">
+          <select class="bill-status ${billStatusClass(item[statusKey])}" id="nas-${escapeAttr(item.ID)}-bill${index}-status" onchange="applyBillStatusColor(this)">${options}</select>
+          <input id="nas-${escapeAttr(item.ID)}-bill${index}-date" type="date" value="${escapeAttr(item[dueKey] || '')}">
+          <input id="nas-${escapeAttr(item.ID)}-bill${index}-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="จำนวนเงิน" value="${escapeAttr(item[amountKey] || '')}" oninput="updateRowBillTotal('${escapeAttr(item.ID)}')">
+        </div>
+      `;
+    }
+
+    function rowBillTotal(item) {
+      return [1, 2, 3, 4].reduce((total, index) => total + Number(item[`Bill${index}Amount`] || 0), 0);
+    }
+
+    function updateRowBillTotal(recordId) {
+      const total = [1, 2, 3, 4].reduce((sum, index) => {
+        const input = $(`nas-${recordId}-bill${index}-amount`);
+        return sum + Number(input && input.value ? input.value : 0);
+      }, 0);
+      const node = $(`nas-${recordId}-total`);
+      if (node) node.textContent = formatMoney(total);
+    }
+
+    function billStatusClass(status) {
+      return status === 'ชำระแล้ว' ? 'paid' : 'unpaid';
+    }
+
+    function applyBillStatusColor(select) {
+      select.classList.toggle('paid', select.value === 'ชำระแล้ว');
+      select.classList.toggle('unpaid', select.value !== 'ชำระแล้ว');
+    }
+
+    function saveNasBilling(recordId) {
+      const payload = {
+        RecordID: recordId,
+        createdBy: $('nasUserFilter').value,
+        month: $('nasMonth').value,
+        year: $('nasYear').value
+      };
+      [1, 2, 3, 4].forEach(index => {
+        payload[`Bill${index}Status`] = $(`nas-${recordId}-bill${index}-status`).value;
+        payload[`Bill${index}DueDate`] = $(`nas-${recordId}-bill${index}-date`).value;
+        payload[`Bill${index}Amount`] = $(`nas-${recordId}-bill${index}-amount`).value;
+      });
+
+      google.script.run
+        .withSuccessHandler(result => {
+          state.nas = result.nas;
+          state.nasSummary = result.nasSummary || buildLocalNasSummary();
+          state.nasCache = {};
+          renderFilterFacets();
+          renderNas();
+          toast('บันทึกข้อมูลบิลเรียบร้อย');
+        })
+        .withFailureHandler(showError)
+        .saveNasBilling(state.token, payload);
+    }
+
+    function callCustomer(recordId) {
+      const item = state.nas.find(row => row.ID === recordId);
+      const tel = normalizePhone(item && item.CustomerPhone);
+      google.script.run
+        .withSuccessHandler(result => {
+          state.callLogs = result.callLogs;
+          state.nasCache = {};
+          renderNas();
+        })
+        .withFailureHandler(showError)
+        .logNasCall(state.token, recordId);
+      if (tel) window.location.href = `tel:${tel}`;
+    }
+
+    function loadNas() {
+      const cacheKey = getNasCacheKey();
+      const cached = state.nasCache[cacheKey];
+      if (cached && Date.now() - cached.time < 60000) {
+        state.nas = cached.nas;
+        state.nasSummary = cached.nasSummary;
+        state.callLogs = cached.callLogs;
+        renderFilterFacets();
+        renderNas();
+        return;
+      }
+      if (state.loadingNas) return;
+      state.loadingNas = true;
+      google.script.run
+        .withSuccessHandler(result => {
+          state.nas = result.nas;
+          state.nasSummary = result.nasSummary || buildLocalNasSummary();
+          state.callLogs = result.callLogs;
+          state.nasCache[cacheKey] = {
+            time: Date.now(),
+            nas: state.nas,
+            nasSummary: state.nasSummary,
+            callLogs: state.callLogs
+          };
+          state.loadingNas = false;
+          renderFilterFacets();
+          renderNas();
+        })
+        .withFailureHandler(error => {
+          state.loadingNas = false;
+          showError(error);
+        })
+        .getNasData(state.token, {
+          createdBy: $('nasUserFilter').value,
+          month: $('nasMonth').value,
+          year: $('nasYear').value
+        });
+    }
+
+    function getNasCacheKey() {
+      return [
+        $('nasUserFilter').value || '',
+        $('nasMonth').value || '',
+        $('nasYear').value || ''
+      ].join('|');
+    }
+
+    function renderUsers() {
+      const body = $('usersBody');
+      if (!state.users.length) {
+        body.innerHTML = '<tr><td colspan="6">ไม่มีข้อมูล USER</td></tr>';
+        return;
+      }
+      body.innerHTML = state.users.map(user => `
+        <tr>
+          <td>${userBadge(user.Username, user.Nickname || user.Name)}</td>
+          <td>${escapeHtml(user.Name || '')}</td>
+          <td>${escapeHtml(user.Nickname || '')}</td>
+          <td>${escapeHtml(user.Role)}</td>
+          <td>${user.Active ? 'TRUE' : 'FALSE'}</td>
+          <td><button class="btn btn-ghost btn-small" type="button" onclick="editUser('${escapeAttr(user.Username)}')">แก้ไข</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function loadUsers() {
+      if (state.user.role !== 'ADMIN' || state.users.length || state.loadingUsers) return;
+      state.loadingUsers = true;
+      google.script.run
+        .withSuccessHandler(users => {
+          state.users = users;
+          state.loadingUsers = false;
+          renderUsers();
+        })
+        .withFailureHandler(error => {
+          state.loadingUsers = false;
+          showError(error);
+        })
+        .listUsers(state.token);
+    }
+
+    function saveRecord(event) {
+      event.preventDefault();
+      if (state.savingRecord) return;
+      if (isStaff() && !$('recordId').value) {
+        toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น ไม่สามารถเพิ่มรายการใหม่ได้');
+        return;
+      }
+      const payload = {
+        ID: $('recordId').value,
+        Code96xxx: $('code96xxx').value,
+        CustomerName: $('customerName').value,
+        InstallDate: $('installDate').value,
+        CallVerStatus: $('callVerStatus').value,
+        InstallStatus: $('installStatus').value,
+        CustomerPhone: $('customerPhone').value,
+        Note: $('note').value,
+        DashboardPeriod: getDashboardPeriodPayload()
+      };
+      const duplicateInfo = getDuplicateInfo(payload);
+      updateDuplicateWarning(duplicateInfo);
+      if (duplicateInfo.hasDuplicate) {
+        const ok = confirm(buildDuplicateConfirmText(duplicateInfo));
+        if (!ok) return;
+      }
+
+      setRecordSaving(true);
+      google.script.run
+        .withSuccessHandler(result => {
+          setRecordSaving(false);
+          upsertLocalRecord(result.record);
+          state.records = filterLocalRecords(state.allRecords, getSearchFilter());
+          state.nasCache = {};
+          renderRecords();
+          resetRecordForm();
+          showView('search');
+          toast('บันทึกข้อมูลเรียบร้อย');
+          loadDashboard(state.dashboardPeriod);
+        })
+        .withFailureHandler(error => {
+          setRecordSaving(false);
+          showError(error);
+        })
+        .saveRecord(state.token, payload);
+    }
+
+    function setRecordSaving(isSaving) {
+      state.savingRecord = isSaving;
+      const button = $('saveRecordBtn');
+      if (!button) return;
+      button.disabled = isSaving;
+      button.textContent = isSaving ? 'กำลังบันทึก...' : 'บันทึกข้อมูล';
+    }
+
+    function updateDuplicateWarning(existingInfo) {
+      const payload = {
+        ID: $('recordId').value,
+        Code96xxx: $('code96xxx').value,
+        CustomerName: $('customerName').value,
+        CustomerPhone: $('customerPhone').value
+      };
+      const info = existingInfo || getDuplicateInfo(payload);
+      const warning = $('duplicateWarning');
+      ['code96xxx', 'customerName', 'customerPhone'].forEach(id => $(id).classList.remove('duplicate-input'));
+      if (!info.hasDuplicate) {
+        if (warning) {
+          warning.style.display = 'none';
+          warning.innerHTML = '';
+        }
+        return;
+      }
+      if (info.fields.code.length) $('code96xxx').classList.add('duplicate-input');
+      if (info.fields.name.length) $('customerName').classList.add('duplicate-input');
+      if (info.fields.phone.length) $('customerPhone').classList.add('duplicate-input');
+      if (warning) {
+        warning.style.display = 'block';
+        warning.innerHTML = `
+          <div>พบข้อมูลซ้ำ กรุณาตรวจสอบก่อนบันทึก</div>
+          <ul>${duplicateMessages(info).map(message => `<li>${escapeHtml(message)}</li>`).join('')}</ul>
+        `;
+      }
+    }
+
+    function getDuplicateInfo(payload) {
+      const excludeId = String(payload.ID || '');
+      const code = normalizeDuplicateValue(payload.Code96xxx);
+      const name = normalizeDuplicateValue(payload.CustomerName);
+      const phone = normalizePhone(payload.CustomerPhone);
+      const info = {
+        hasDuplicate: false,
+        fields: { code: [], name: [], phone: [] }
+      };
+      state.allRecords
+        .filter(record => String(record.ID || '') !== excludeId)
+        .forEach(record => {
+          if (code && normalizeDuplicateValue(record.Code96xxx) === code) info.fields.code.push(record);
+          if (name && normalizeDuplicateValue(record.CustomerName) === name) info.fields.name.push(record);
+          if (phone && normalizePhone(record.CustomerPhone) === phone) info.fields.phone.push(record);
+        });
+      info.hasDuplicate = Boolean(info.fields.code.length || info.fields.name.length || info.fields.phone.length);
+      return info;
+    }
+
+    function duplicateMessages(info) {
+      const messages = [];
+      if (info.fields.code.length) messages.push(`96xxx ซ้ำ ${info.fields.code.length} รายการ: ${duplicateRecordList(info.fields.code)}`);
+      if (info.fields.name.length) messages.push(`ชื่อ-นามสกุลซ้ำ ${info.fields.name.length} รายการ: ${duplicateRecordList(info.fields.name)}`);
+      if (info.fields.phone.length) messages.push(`เบอร์โทรลูกค้าซ้ำ ${info.fields.phone.length} รายการ: ${duplicateRecordList(info.fields.phone)}`);
+      return messages;
+    }
+
+    function duplicateRecordList(records) {
+      return records.slice(0, 5).map(record => `${record.Code96xxx || '-'} / ${record.CustomerName || '-'} / ${record.CustomerPhone || '-'}`).join(', ');
+    }
+
+    function buildDuplicateConfirmText(info) {
+      return `พบข้อมูลซ้ำ:\n- ${duplicateMessages(info).join('\n- ')}\n\nยืนยันที่จะบันทึกจริงไหม?`;
+    }
+
+    function normalizeDuplicateValue(value) {
+      return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    }
+
+    function searchRecords() {
+      applySearchFilters();
+    }
+
+    function applySearchFilters() {
+      state.records = filterLocalRecords(state.allRecords, getSearchFilter());
+      renderRecords();
+    }
+
+    function getSearchFilter() {
+      state.searchFilter.keyword = $('keywordFilter').value;
+      state.searchFilter.dateFrom = $('searchDateFrom').value;
+      state.searchFilter.dateTo = $('searchDateTo').value;
+      state.searchFilter.month = $('searchMonth').value;
+      state.searchFilter.year = $('searchYear').value;
+      state.searchFilter.sort = $('searchSort').value;
+      return Object.assign({}, state.searchFilter);
+    }
+
+    function resetSearchFilters() {
+      state.searchFilter = {
+        keyword: '', dateFrom: '', dateTo: '', month: '', year: '',
+        statuses: [], callVerStatuses: [], users: [], sort: 'date-desc'
+      };
+      $('keywordFilter').value = '';
+      $('searchDateFrom').value = '';
+      $('searchDateTo').value = '';
+      $('searchMonth').value = '';
+      $('searchYear').value = state.searchFilter.year;
+      $('searchSort').value = 'date-desc';
+      renderFilterFacets();
+      applySearchFilters();
+    }
+
+    function upsertLocalRecord(record) {
+      if (!record || !record.ID) return;
+      const existingIndex = state.allRecords.findIndex(item => item.ID === record.ID);
+      if (existingIndex >= 0) {
+        state.allRecords.splice(existingIndex, 1, record);
+      } else {
+        state.allRecords.unshift(record);
+      }
+      state.allRecords.sort((a, b) => String(b.UpdatedAt || b.CreatedAt).localeCompare(String(a.UpdatedAt || a.CreatedAt)));
+    }
+
+    function filterLocalRecords(rows, filter) {
+      const keyword = String(filter && filter.keyword ? filter.keyword : '').trim().toLowerCase();
+      const dateFrom = String(filter && filter.dateFrom || '');
+      const dateTo = String(filter && filter.dateTo || '');
+      const month = String(filter && filter.month || '');
+      const year = String(filter && filter.year || '');
+      const statuses = filter && filter.statuses || [];
+      const callVerStatuses = filter && filter.callVerStatuses || [];
+      const users = filter && filter.users || [];
+      const sort = String(filter && filter.sort || 'date-desc');
+
+      const filtered = rows
+        .filter(record => !statuses.length || statuses.includes(String(record.InstallStatus || '')))
+        .filter(record => !callVerStatuses.length || callVerStatuses.includes(String(record.CallVerStatus || '')))
+        .filter(record => !users.length || users.includes(String(record.OwnerUsername || '')))
+        .filter(record => {
+          const date = String(record.InstallDate || '').slice(0, 10);
+          if (dateFrom && (!date || date < dateFrom)) return false;
+          if (dateTo && (!date || date > dateTo)) return false;
+          if (year && (!date || date.slice(0, 4) !== year)) return false;
+          if (month && (!date || String(Number(date.slice(5, 7))) !== month)) return false;
+          return true;
+        })
+        .filter(record => {
+          if (!keyword) return true;
+          return [
+            record.ID,
+            record.OwnerUsername,
+            record.Code96xxx,
+            record.CustomerName,
+            record.InstallDate,
+            record.CallVerStatus,
+            record.InstallStatus,
+            record.CustomerPhone,
+            record.Note
+          ].join(' ').toLowerCase().includes(keyword);
+        });
+
+      const comparators = {
+        'date-desc': (a, b) => String(b.InstallDate || '').localeCompare(String(a.InstallDate || '')),
+        'date-asc': (a, b) => String(a.InstallDate || '').localeCompare(String(b.InstallDate || '')),
+        'updated-desc': (a, b) => String(b.UpdatedAt || b.CreatedAt).localeCompare(String(a.UpdatedAt || a.CreatedAt)),
+        'code-asc': (a, b) => String(a.Code96xxx || '').localeCompare(String(b.Code96xxx || ''), 'th', { numeric: true }),
+        'name-asc': (a, b) => String(a.CustomerName || '').localeCompare(String(b.CustomerName || ''), 'th')
+      };
+      return filtered.sort(comparators[sort] || comparators['date-desc']);
+    }
+
+    function editRecord(id) {
+      const record = state.records.find(item => item.ID === id) || (state.dashboard.records || []).find(item => item.ID === id);
+      if (!record) return;
+      $('recordId').value = record.ID;
+      $('code96xxx').value = record.Code96xxx;
+      $('customerName').value = record.CustomerName || '';
+      $('installDate').value = record.InstallDate;
+      $('callVerStatus').value = record.CallVerStatus;
+      $('installStatus').value = record.InstallStatus;
+      $('customerPhone').value = record.CustomerPhone;
+      $('createdByDisplay').value = record.OwnerUsername;
+      $('note').value = record.Note;
+      $('formTitle').textContent = 'แก้ไขข้อมูล';
+      updateDuplicateWarning();
+      showView('form');
+    }
+
+    function removeRecord(id) {
+      if (isStaff()) {
+        toast('STAFF ไม่มีสิทธิ์ลบข้อมูล');
+        return;
+      }
+      if (!confirm('ยืนยันลบรายการนี้?')) return;
+      google.script.run
+        .withSuccessHandler(result => {
+          removeLocalRecord(result.id || id);
+          state.records = filterLocalRecords(state.allRecords, getSearchFilter());
+          state.nasCache = {};
+          renderRecords();
+          toast('ลบข้อมูลเรียบร้อย');
+          loadDashboard(state.dashboardPeriod);
+        })
+        .withFailureHandler(showError)
+        .deleteRecord(state.token, id, getDashboardPeriodPayload());
+    }
+
+    function removeLocalRecord(id) {
+      state.allRecords = state.allRecords.filter(item => item.ID !== id);
+      state.records = state.records.filter(item => item.ID !== id);
+    }
+
+    function resetRecordForm() {
+      $('recordForm').reset();
+      $('recordId').value = '';
+      $('createdByDisplay').value = state.user ? state.user.username : '';
+      $('installStatus').value = 'Scheduled';
+      $('formTitle').textContent = 'คีย์ข้อมูลใหม่';
+      updateDuplicateWarning();
+    }
+
+    function saveUser(event) {
+      event.preventDefault();
+      const payload = {
+        Username: $('userUsername').value,
+        Name: $('userName').value,
+        Nickname: $('userNickname').value,
+        Role: $('userRole').value,
+        Password: $('userPassword').value,
+        Active: $('userActive').value
+      };
+      google.script.run
+        .withSuccessHandler(result => {
+          state.users = result.users;
+          renderUsers();
+          clearUserForm();
+          toast('บันทึก USER เรียบร้อย');
+        })
+        .withFailureHandler(showError)
+        .saveUser(state.token, payload);
+    }
+
+    function editUser(username) {
+      const user = state.users.find(item => item.Username === username);
+      if (!user) return;
+      $('userUsername').value = user.Username;
+      $('userName').value = user.Name || '';
+      $('userNickname').value = user.Nickname || '';
+      $('userRole').value = user.Role;
+      $('userPassword').value = '';
+      $('userActive').value = user.Active ? 'TRUE' : 'FALSE';
+    }
+
+    function clearUserForm() {
+      $('userForm').reset();
+      $('userActive').value = 'TRUE';
+    }
+
+    function repairSystemData() {
+      if (!confirm('ต้องการตรวจ/ซ่อมข้อมูลระบบตอนนี้หรือไม่? ระบบจะไม่ลบข้อมูลเดิม')) return;
+      const button = $('repairSystemBtn');
+      button.disabled = true;
+      button.textContent = 'กำลังตรวจ...';
+      google.script.run
+        .withSuccessHandler(report => {
+          button.disabled = false;
+          button.textContent = 'ตรวจ/ซ่อมข้อมูลระบบ';
+          state.nasCache = {};
+          toast(`ตรวจเสร็จ: ซ่อมประวัติโทร ${report.fixedCallLogs || 0} รายการ`);
+        })
+        .withFailureHandler(error => {
+          button.disabled = false;
+          button.textContent = 'ตรวจ/ซ่อมข้อมูลระบบ';
+          showError(error);
+        })
+        .repairSystemData(state.token);
+    }
+
+    function exportDashboardExcel() {
+      exportRowsAsExcel('dashboard', 'Dashboard', state.dashboard.records || [], dashboardExportColumns());
+    }
+
+    function exportDashboardPdf() {
+      exportRowsAsPdf('Dashboard', state.dashboard.records || [], dashboardExportColumns());
+    }
+
+    function exportSearchExcel() {
+      exportRowsAsExcel('search', 'Search', state.records || [], searchExportColumns());
+    }
+
+    function exportSearchPdf() {
+      exportRowsAsPdf('Search', state.records || [], searchExportColumns());
+    }
+
+    function exportNasExcel() {
+      exportRowsAsExcel('nas', 'NAS', filterNasRows(state.nas || []), nasExportColumns());
+    }
+
+    function exportNasPdf() {
+      exportRowsAsPdf('NAS', filterNasRows(state.nas || []), nasExportColumns());
+    }
+
+    function dashboardExportColumns() {
+      return [
+        ['96xxx', 'Code96xxx'],
+        ['ชื่อ-นามสกุล', 'CustomerName'],
+        ['วันที่ติดตั้ง', 'InstallDate'],
+        ['Call Ver', 'CallVerStatus'],
+        ['สถานะ', 'InstallStatus'],
+        ['เบอร์ลูกค้า', 'CustomerPhone'],
+        ['USER', 'OwnerUsername']
+      ];
+    }
+
+    function searchExportColumns() {
+      return [
+        ['96xxx', 'Code96xxx'],
+        ['ชื่อ-นามสกุล', 'CustomerName'],
+        ['วันที่ติดตั้ง', 'InstallDate'],
+        ['Call Ver', 'CallVerStatus'],
+        ['สถานะ', 'InstallStatus'],
+        ['เบอร์ลูกค้า', 'CustomerPhone'],
+        ['USER', 'OwnerUsername'],
+        ['อัปเดต', row => row.UpdatedAt || row.CreatedAt]
+      ];
+    }
+
+    function nasExportColumns() {
+      return [
+        ['96xxx', 'Code96xxx'],
+        ['ชื่อ-นามสกุล', 'CustomerName'],
+        ['วันที่ติดตั้ง', 'InstallDate'],
+        ['เบอร์ลูกค้า', 'CustomerPhone'],
+        ['USER', 'OwnerUsername'],
+        ['บิล1', 'Bill1Status'],
+        ['กำหนดชำระบิล1', 'Bill1DueDate'],
+        ['จำนวนเงินบิล1', 'Bill1Amount'],
+        ['บิล2', 'Bill2Status'],
+        ['กำหนดชำระบิล2', 'Bill2DueDate'],
+        ['จำนวนเงินบิล2', 'Bill2Amount'],
+        ['บิล3', 'Bill3Status'],
+        ['กำหนดชำระบิล3', 'Bill3DueDate'],
+        ['จำนวนเงินบิล3', 'Bill3Amount'],
+        ['บิล4', 'Bill4Status'],
+        ['กำหนดชำระบิล4', 'Bill4DueDate'],
+        ['จำนวนเงินบิล4', 'Bill4Amount'],
+        ['TOTAL', row => rowBillTotal(row)],
+        ['จัดเก็บไฟล์', row => row.ArchiveStatus || archiveStatus(row)]
+      ];
+    }
+
+    function exportRowsAsExcel(prefix, title, rows, columns) {
+      const html = buildReportTable(title, rows, columns);
+      const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      downloadBlob(blob, `${prefix}-${dateStamp()}.xls`);
+    }
+
+    function exportRowsAsPdf(title, rows, columns) {
+      const html = `
+        <!doctype html>
+        <html lang="th">
+        <head>
+          <meta charset="utf-8">
+          <title>${escapeHtml(title)}</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #111827; }
+            h1 { font-size: 20px; margin: 0 0 12px; }
+            table { width: 100%; border-collapse: collapse; font-size: 11px; }
+            th, td { border: 1px solid #d1d5db; padding: 6px; text-align: left; }
+            th { background: #f3f4f6; }
+          </style>
+        </head>
+        <body>${buildReportTable(title, rows, columns)}</body>
+        </html>
+      `;
+      const win = window.open('', '_blank');
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 300);
+    }
+
+    function buildReportTable(title, rows, columns) {
+      const head = columns.map(([label]) => `<th>${escapeHtml(label)}</th>`).join('');
+      const body = rows.length ? rows.map(row => `
+        <tr>${columns.map(([, key]) => `<td>${escapeHtml(getExportValue(row, key))}</td>`).join('')}</tr>
+      `).join('') : `<tr><td colspan="${columns.length}">ไม่มีข้อมูล</td></tr>`;
+      return `<h1>${escapeHtml(title)}</h1><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    }
+
+    function getExportValue(row, key) {
+      if (typeof key === 'function') return key(row);
+      return row[key] || '';
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function dateStamp() {
+      const now = new Date();
+      return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function canSeeAll() {
+      return ['ADMIN', 'MANAGER'].includes(state.user && state.user.role);
+    }
+
+    function isStaff() {
+      return Boolean(state.user && state.user.role === 'STAFF');
+    }
+
+    function showError(error) {
+      toast(error && error.message ? error.message : String(error));
+    }
+
+    function toast(message) {
+      const node = $('toast');
+      node.textContent = message;
+      node.style.display = 'block';
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => node.style.display = 'none', 3500);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function normalizePhone(value) {
+      return String(value || '').replace(/[^\d+]/g, '');
+    }
+
+    function getDuplicateFields(record, rows) {
+      const fields = [];
+      const id = String(record.ID || record.RecordID || '');
+      const code = normalizeDuplicateValue(record.Code96xxx);
+      const name = normalizeDuplicateValue(record.CustomerName);
+      const phone = normalizePhone(record.CustomerPhone);
+      const hasSame = predicate => rows.some(item => {
+        const itemId = String(item.ID || item.RecordID || '');
+        return itemId !== id && predicate(item);
+      });
+      if (code && hasSame(item => normalizeDuplicateValue(item.Code96xxx) === code)) fields.push('code');
+      if (name && hasSame(item => normalizeDuplicateValue(item.CustomerName) === name)) fields.push('name');
+      if (phone && hasSame(item => normalizePhone(item.CustomerPhone) === phone)) fields.push('phone');
+      return fields;
+    }
+
+    function userBadge(username, label) {
+      const text = String(label || username || '').trim();
+      const user = String(username || text || '').trim().toLowerCase();
+      const color = userColor(user);
+      return `<span class="user-chip" style="background:${color.bg};color:${color.fg};border-color:${color.border};" title="${escapeAttr(user)}">${escapeHtml(text || '-')}</span>`;
+    }
+
+    function userColor(username) {
+      const text = String(username || 'user');
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
+      const hue = Math.abs(hash) % 360;
+      return {
+        bg: `hsl(${hue}, 78%, 92%)`,
+        fg: `hsl(${hue}, 72%, 24%)`,
+        border: `hsl(${hue}, 65%, 76%)`
+      };
+    }
+
+    function formatDuration(seconds) {
+      const total = Number(seconds || 0);
+      if (!total) return '-';
+      const minutes = Math.floor(total / 60);
+      const rest = total % 60;
+      return `${minutes}:${String(rest).padStart(2, '0')}`;
+    }
+
+    function getDashboardPeriodPayload() {
+      return {
+        mode: state.dashboardPeriod,
+        month: state.dashboardMonth,
+        year: state.dashboardYear,
+        createdBy: $('dashboardUserFilter').value
+      };
+    }
+
+    function archiveStatus(item) {
+      return [1, 2, 3, 4].every(index => item[`Bill${index}Status`] === 'ชำระแล้ว') ? 'จัดเก็บไฟล์ได้' : 'รอติดตามบิล';
+    }
+
+    function archiveClass(status) {
+      return status === 'จัดเก็บไฟล์ได้' ? 'archive-ready' : 'archive-wait';
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toLocaleString('th-TH', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function buildLocalNasSummary() {
+      return buildNasSummaryFromRows(state.nas);
+    }
+
+    function buildNasSummaryFromRows(rows) {
+      const totalJobs = rows.length;
+      const totalBills = totalJobs * 4;
+      let paidBills = 0;
+      let unpaidBills = 0;
+      let totalAmount = 0;
+      let unpaidAmount = 0;
+
+      rows.forEach(item => {
+        [1, 2, 3, 4].forEach(index => {
+          const amount = Number(item[`Bill${index}Amount`] || 0);
+          totalAmount += amount;
+          if (item[`Bill${index}Status`] === 'ชำระแล้ว') {
+            paidBills++;
+          } else {
+            unpaidBills++;
+            unpaidAmount += amount;
+          }
+        });
+      });
+
+      return {
+        totalJobs,
+        totalBills,
+        paidBills,
+        unpaidBills,
+        totalAmount,
+        unpaidAmount,
+        paidPercent: totalBills ? Math.round((paidBills / totalBills) * 100) : 0,
+        unpaidPercent: totalBills ? Math.round((unpaidBills / totalBills) * 100) : 0
+      };
+    }
+  </script>
+</body>
+</html>
