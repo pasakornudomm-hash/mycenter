@@ -165,18 +165,10 @@
             </label>
             <button class="btn btn-primary btn-small" id="searchBtn" type="button">ใช้ตัวกรอง</button>
             <button class="btn btn-ghost btn-small" id="resetSearchFiltersBtn" type="button">ล้างตัวกรอง</button>
-            <div class="permission-note hidden" id="staffPermissionNote">STAFF แก้ไขรายการของตนเองได้ แต่เพิ่มหรือลบรายการไม่ได้</div>
+            <div class="permission-note hidden" id="staffPermissionNote">STAFF เพิ่มและแก้ไขรายการได้ แต่ไม่มีสิทธิ์ลบรายการ</div>
           </div>
         </div>
         <div class="month-strip" id="searchMonthChips" aria-label="เลือกเดือน"></div>
-        <div class="column-tools">
-          <div class="column-tools-title">เลือกคอลัมน์ที่ต้องการแสดง</div>
-          <div class="column-checks" id="searchColumnChecks"></div>
-          <div class="actions">
-            <button class="btn btn-ghost btn-small" type="button" onclick="resetSearchColumns()">แสดงทั้งหมด</button>
-            <button class="btn btn-ghost btn-small" type="button" onclick="clearSearchColumns()">ล้างที่เลือก</button>
-          </div>
-        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -254,14 +246,6 @@
                 </div>
               </div>
               <div class="facet-row" id="nasFacetFilters"></div>
-            </div>
-            <div class="column-tools">
-              <div class="column-tools-title">เลือกคอลัมน์ NAS ที่ต้องการแสดง</div>
-              <div class="column-checks" id="nasColumnChecks"></div>
-              <div class="actions">
-                <button class="btn btn-ghost btn-small" type="button" onclick="resetNasColumns()">แสดงทั้งหมด</button>
-                <button class="btn btn-ghost btn-small" type="button" onclick="clearNasColumns()">ล้างที่เลือก</button>
-              </div>
             </div>
             <div class="table-wrap">
               <table class="nas-table">
