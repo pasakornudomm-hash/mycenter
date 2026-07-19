@@ -167,6 +167,7 @@
       loadingNas: false,
       loadingUsers: false,
       savingRecord: false,
+      recentRecordSubmissions: new Map(),
       savingUser: false,
       loginPending: false,
       pendingNasSaves: new Set(),
@@ -176,8 +177,6 @@
       recordRenderLimit: 250,
       nasRenderLimit: 120,
       duplicateIndex: { code: new Map(), name: new Map(), phone: new Map() },
-      searchColumns: ['code', 'name', 'date', 'callver', 'status', 'phone', 'user'],
-      nasColumns: ['code', 'name', 'date', 'phone', 'user', 'bill1', 'bill2', 'bill3', 'bill4', 'archive'],
       searchFilter: {
         keyword: '', dateFrom: '', dateTo: '', month: '', year: '',
         statuses: [], callVerStatuses: [], users: [], sort: 'date-desc'
@@ -276,10 +275,6 @@
       });
       $('resetSearchFiltersBtn').addEventListener('click', resetSearchFilters);
       $('newRecordBtn').addEventListener('click', () => {
-        if (isStaff()) {
-          toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น ไม่สามารถเพิ่มรายการใหม่ได้');
-          return;
-        }
         resetRecordForm();
         showView('form');
       });
@@ -375,7 +370,6 @@
       state.nasSummary = data.nasSummary || buildLocalNasSummary();
       hydrateOptions();
       hydrateDashboardPeriodSelectors();
-      renderColumnTools();
       renderAll();
       resetRecordForm();
     }
@@ -461,11 +455,6 @@
       });
     }
 
-    function renderColumnTools() {
-      renderColumnChecks('searchColumnChecks', searchColumnDefinitions(), state.searchColumns, toggleSearchColumn);
-      renderColumnChecks('nasColumnChecks', nasColumnDefinitions(), state.nasColumns, toggleNasColumn);
-    }
-
     function renderFilterFacets() {
       const recordUsers = uniqueValues(state.allRecords, 'OwnerUsername');
       const nasUsers = uniqueValues(state.nas, 'OwnerUsername');
@@ -525,20 +514,6 @@
         .sort((a, b) => a.localeCompare(b, 'th'));
     }
 
-    function renderColumnChecks(containerId, columns, selected, toggleFn) {
-      const container = $(containerId);
-      if (!container) return;
-      container.innerHTML = columns.map(column => `
-        <label>
-          <input type="checkbox" value="${escapeAttr(column.key)}" ${selected.includes(column.key) ? 'checked' : ''}>
-          ${escapeHtml(column.label)}
-        </label>
-      `).join('');
-      container.querySelectorAll('input').forEach(input => {
-        input.addEventListener('change', () => toggleFn(input.value, input.checked));
-      });
-    }
-
     function searchColumnDefinitions() {
       return [
         { key: 'code', label: '96xxx' },
@@ -566,49 +541,7 @@
       ];
     }
 
-    function toggleSearchColumn(key, checked) {
-      state.searchColumns = checked
-        ? [...new Set([...state.searchColumns, key])]
-        : state.searchColumns.filter(item => item !== key);
-      renderRecords();
-    }
-
-    function toggleNasColumn(key, checked) {
-      state.nasColumns = checked
-        ? [...new Set([...state.nasColumns, key])]
-        : state.nasColumns.filter(item => item !== key);
-      renderNas();
-    }
-
-    function resetSearchColumns() {
-      state.searchColumns = searchColumnDefinitions().map(item => item.key);
-      renderColumnTools();
-      renderRecords();
-    }
-
-    function clearSearchColumns() {
-      state.searchColumns = [];
-      renderColumnTools();
-      renderRecords();
-    }
-
-    function resetNasColumns() {
-      state.nasColumns = nasColumnDefinitions().map(item => item.key);
-      renderColumnTools();
-      renderNas();
-    }
-
-    function clearNasColumns() {
-      state.nasColumns = [];
-      renderColumnTools();
-      renderNas();
-    }
-
     function showView(view) {
-      if (view === 'form' && isStaff() && !$('recordId').value) {
-        toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น กรุณาเลือกรายการจากหน้าค้นหา');
-        view = 'search';
-      }
       views.forEach(name => $(`${name}View`).classList.toggle('hidden', name !== view));
       document.querySelectorAll('.nav button').forEach(button => {
         button.classList.toggle('active', button.dataset.view === view);
@@ -643,9 +576,6 @@
       $('rolePill').textContent = state.user.role;
       $('userBox').innerHTML = `<strong>${escapeHtml(state.user.name)}</strong><br>USER: ${escapeHtml(state.user.username)}`;
       $('usersNav').classList.toggle('hidden', state.user.role !== 'ADMIN');
-      const formNav = document.querySelector('.nav button[data-view="form"]');
-      if (formNav) formNav.classList.toggle('hidden', isStaff());
-      $('newRecordBtn').classList.toggle('hidden', isStaff());
       $('staffPermissionNote').classList.toggle('hidden', !isStaff());
     }
 
@@ -716,7 +646,7 @@
     function renderRecords() {
       const body = $('recordsBody');
       const table = body.closest('table');
-      const columns = searchColumnDefinitions().filter(column => state.searchColumns.includes(column.key));
+      const columns = searchColumnDefinitions();
       const headers = [
         ...columns.map(column => `<th>${escapeHtml(column.label)}</th>`),
         '<th>อัปเดต</th>',
@@ -726,7 +656,6 @@
       renderSearchMonthChips();
       const visibleRecords = state.records.slice(0, state.recordRenderLimit);
       const renderKey = JSON.stringify([
-        state.searchColumns,
         state.records.length,
         state.recordRenderLimit,
         visibleRecords.map(record => [record.ID, record.UpdatedAt, record.CreatedAt])
@@ -833,9 +762,8 @@
 
       const body = $('nasBody');
       const table = body.closest('table');
-      const columns = nasColumnDefinitions().filter(column => state.nasColumns.includes(column.key));
+      const columns = nasColumnDefinitions();
       const nasTableKey = JSON.stringify([
-        state.nasColumns,
         nasRows.length,
         state.nasRenderLimit,
         visibleNasRows.map(item => [item.ID, item.UpdatedAt, item.ArchiveStatus])
@@ -1163,10 +1091,6 @@
     function saveRecord(event) {
       event.preventDefault();
       if (state.savingRecord) return;
-      if (isStaff() && !$('recordId').value) {
-        toast('STAFF แก้ไขข้อมูลเดิมได้เท่านั้น ไม่สามารถเพิ่มรายการใหม่ได้');
-        return;
-      }
       const payload = {
         ID: $('recordId').value,
         Code96xxx: $('code96xxx').value,
@@ -1178,6 +1102,11 @@
         Note: $('note').value,
         DashboardPeriod: getDashboardPeriodPayload()
       };
+      const submissionKey = buildRecordSubmissionKey(payload);
+      if (isRecentRecordSubmission(submissionKey)) {
+        toast('รายการนี้เพิ่งถูกบันทึกไป กรุณารอครู่หนึ่งเพื่อลดการบันทึกซ้ำ');
+        return;
+      }
       const duplicateInfo = getDuplicateInfo(payload);
       updateDuplicateWarning(duplicateInfo);
       if (duplicateInfo.hasDuplicate) {
@@ -1185,6 +1114,8 @@
         if (!ok) return;
       }
 
+      state.recentRecordSubmissions.set(submissionKey, Date.now());
+      payload.RequestId = submissionKey;
       setRecordSaving(true);
       google.script.run
         .withSuccessHandler(result => {
@@ -1199,10 +1130,34 @@
           loadDashboard(state.dashboardPeriod);
         })
         .withFailureHandler(error => {
+          state.recentRecordSubmissions.delete(submissionKey);
           setRecordSaving(false);
           showError(error);
         })
         .saveRecord(state.token, payload);
+    }
+
+    function buildRecordSubmissionKey(payload) {
+      return [
+        state.user && state.user.username,
+        payload.ID || 'new',
+        normalizeDuplicateValue(payload.Code96xxx),
+        normalizeDuplicateValue(payload.CustomerName),
+        normalizePhone(payload.CustomerPhone),
+        payload.InstallDate || '',
+        payload.CallVerStatus || '',
+        payload.InstallStatus || '',
+        String(payload.Note || '').trim()
+      ].join('|');
+    }
+
+    function isRecentRecordSubmission(key) {
+      const now = Date.now();
+      for (const [savedKey, savedAt] of state.recentRecordSubmissions.entries()) {
+        if (now - savedAt > 20000) state.recentRecordSubmissions.delete(savedKey);
+      }
+      const savedAt = state.recentRecordSubmissions.get(key);
+      return Boolean(savedAt && now - savedAt <= 20000);
     }
 
     function setRecordSaving(isSaving) {
