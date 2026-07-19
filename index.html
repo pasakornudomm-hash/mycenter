@@ -1244,7 +1244,7 @@
     function installNetlifyAppsScriptBridge() {
       if (typeof google !== 'undefined' && google.script && google.script.run) return;
       if (window.location.protocol === 'file:') return;
-      const endpoint = '/.netlify/functions/apps-script';
+      
       const createRunner = (successHandler, failureHandler) => new Proxy({}, {
         get(target, prop) {
           if (prop === 'withSuccessHandler') {
@@ -1256,7 +1256,7 @@
           return (...args) => {
             fetch(endpoint, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              const endpoint = 'https://script.google.com/macros/s/AKfycbwBf85PSB_G8ovzVU-f2wyu8ogrbwlkf8IcqzotPOt3SKCyb6HntYZdk3_R4lEOEZY/exec';
               body: JSON.stringify({ fn: String(prop), args })
             })
               .then(response => response.json())
