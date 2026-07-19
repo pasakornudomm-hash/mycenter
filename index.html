@@ -1245,7 +1245,7 @@
       if (typeof google !== 'undefined' && google.script && google.script.run) return;
       if (window.location.protocol === 'file:') return;
       
-      const createRunner = (successHandler, failureHandler) => new Proxy({}, {
+      
         get(target, prop) {
           if (prop === 'withSuccessHandler') {
             return handler => createRunner(handler, failureHandler);
