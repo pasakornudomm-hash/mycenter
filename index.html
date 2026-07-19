@@ -1,11 +1,9 @@
-<!doctype html>
-<html lang="th">
-<head>
+<html lang="th"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --true-red: #e60012;
@@ -910,8 +908,8 @@
       </div>
       <form id="loginForm">
         <div class="grid">
-          <label class="required span-2">USER<input id="loginUsername" autocomplete="username" required></label>
-          <label class="required span-2">รหัสผ่าน<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+          <label class="required span-2">USER<input id="loginUsername" autocomplete="username" required=""></label>
+          <label class="required span-2">รหัสผ่าน<input id="loginPassword" type="password" autocomplete="current-password" required=""></label>
         </div>
         <div class="actions">
           <button class="btn btn-primary" type="submit">เข้าสู่ระบบ</button>
@@ -926,7 +924,7 @@
         <div class="logo">MY</div>
         <div>
           <strong>MYCENTER</strong>
-          <span>Mobile & PC Web App</span>
+          <span>Mobile &amp; PC Web App</span>
         </div>
       </div>
       <nav class="nav">
@@ -998,13 +996,13 @@
           <input type="hidden" id="recordId">
           <div class="duplicate-warning" id="duplicateWarning"></div>
           <div class="grid">
-            <label class="required">96xxx<input id="code96xxx" required placeholder="เช่น 96123"></label>
-            <label class="required">ชื่อ-นามสกุล<input id="customerName" required placeholder="ชื่อลูกค้า"></label>
+            <label class="required">96xxx<input id="code96xxx" required="" placeholder="เช่น 96123"></label>
+            <label class="required">ชื่อ-นามสกุล<input id="customerName" required="" placeholder="ชื่อลูกค้า"></label>
             <label>วันที่ติดตั้ง<input id="installDate" type="date"></label>
-            <label class="required">Call Ver Status<select id="callVerStatus" required></select></label>
+            <label class="required">Call Ver Status<select id="callVerStatus" required=""></select></label>
             <label>สถานะติดตั้ง<select id="installStatus"></select></label>
-            <label class="required">เบอร์โทรลูกค้า<input id="customerPhone" required inputmode="tel" placeholder="08x-xxx-xxxx"></label>
-            <label>USER ผู้คีย์<input id="createdByDisplay" disabled></label>
+            <label class="required">เบอร์โทรลูกค้า<input id="customerPhone" required="" inputmode="tel" placeholder="08x-xxx-xxxx"></label>
+            <label>USER ผู้คีย์<input id="createdByDisplay" disabled=""></label>
             <label class="span-2">หมายเหตุ<textarea id="note" placeholder="รายละเอียดเพิ่มเติม"></textarea></label>
           </div>
           <div class="actions">
@@ -1204,10 +1202,10 @@
         <div class="panel-title">จัดการ USER</div>
         <form id="userForm">
           <div class="grid">
-            <label class="required">USER<input id="userUsername" required autocomplete="off"></label>
+            <label class="required">USER<input id="userUsername" required="" autocomplete="off"></label>
             <label>ชื่อ<input id="userName" placeholder="ชื่อพนักงาน"></label>
             <label>ชื่อเล่น<input id="userNickname" placeholder="ชื่อเล่น เช่น น้องเอ"></label>
-            <label class="required">ตำแหน่ง<select id="userRole" required></select></label>
+            <label class="required">ตำแหน่ง<select id="userRole" required=""></select></label>
             <label>รหัสผ่าน<input id="userPassword" type="password" autocomplete="new-password"></label>
             <label>เปิดใช้งาน<select id="userActive"><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option></select></label>
           </div>
@@ -1244,33 +1242,37 @@
     function installNetlifyAppsScriptBridge() {
       if (typeof google !== 'undefined' && google.script && google.script.run) return;
       if (window.location.protocol === 'file:') return;
-      
-      
+
+      const endpoint = 'https://script.google.com/macros/s/AKfycbwBf85PSB_G8ovzVU-f2wyu8ogrbwlkf8IcqzotPOt3SKCyb6HntYZdk3_R4lEOEZY/exec';
+      const createRunner = (successHandler, failureHandler) => new Proxy({}, {
         get(target, prop) {
-          if (prop === 'withSuccessHandler') {
-            return handler => createRunner(handler, failureHandler);
-          }
-          if (prop === 'withFailureHandler') {
-            return handler => createRunner(successHandler, handler);
-          }
+          if (prop === 'withSuccessHandler') return handler => createRunner(handler, failureHandler);
+          if (prop === 'withFailureHandler') return handler => createRunner(successHandler, handler);
           return (...args) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 20000);
             fetch(endpoint, {
               method: 'POST',
-              const endpoint = 'https://script.google.com/macros/s/AKfycbwBf85PSB_G8ovzVU-f2wyu8ogrbwlkf8IcqzotPOt3SKCyb6HntYZdk3_R4lEOEZY/exec';
-              body: JSON.stringify({ fn: String(prop), args })
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ fn: String(prop), args }),
+              redirect: 'follow',
+              signal: controller.signal
             })
-              .then(response => response.json())
+              .then(async response => {
+                const text = await response.text();
+                if (!response.ok) throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ (' + response.status + ')');
+                try { return JSON.parse(text); }
+                catch (_) { throw new Error('Google Apps Script ตอบกลับไม่ใช่ JSON กรุณา Deploy Web App เวอร์ชันล่าสุด'); }
+              })
               .then(result => {
-                if (!result.ok) throw new Error(result.error || 'Server error');
+                if (!result || !result.ok) throw new Error((result && result.error) || 'Server error');
                 if (successHandler) successHandler(result.data);
               })
               .catch(error => {
-                if (failureHandler) {
-                  failureHandler(error);
-                } else {
-                  throw error;
-                }
-              });
+                if (failureHandler) failureHandler(error);
+                else console.error(error);
+              })
+              .finally(() => clearTimeout(timer));
           };
         }
       });
@@ -2752,5 +2754,6 @@
       };
     }
   </script>
-</body>
-</html>
+
+
+</body><div id="codex-agent-overlay-root" data-codex-agent-overlay-root="true"></div></html>
