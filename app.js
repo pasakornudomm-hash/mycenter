@@ -36,6 +36,9 @@
       }
 
       async function fetchApi(method, args) {
+        if (method === 'deleteRecord' && state.user && state.user.role === 'STAFF') {
+          throw new Error('STAFF ไม่มีสิทธิ์ลบข้อมูล');
+        }
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
         setApiPending(1);
